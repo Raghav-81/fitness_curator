@@ -1,0 +1,28 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual Environments
+.env
+.venv
+env/
+venv/
+
+# Database Files
+*.db
+*.sqlite3
+fitness_curator.db
+
+# IDE / Editor Configuration
+.vscode/
+.idea/
+
+# Logs
+*.log
+logs/
+
+# OS-generated files
+.DS_Store
+Thumbs.db

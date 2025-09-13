@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Workout Dashboard | Trainer & Client Portal</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div id="app">
+        <!-- Login Screen (initial view) -->
+        <div id="login-view" class="view active">
+            <div class="auth-container">
+                <div class="auth-card">
+                    <div class="auth-header">
+                        <h1><i class="fas fa-dumbbell"></i> Workout Pro</h1>
+                        <p>Sign in to access your dashboard</p>
+                    </div>
+                    
+                    <div class="auth-body">
+                        <div class="auth-tabs">
+                            <button class="auth-tab active" data-tab="login">Sign In</button>
+                            <button class="auth-tab" data-tab="register">Register</button>
+                        </div>
+                        
+                        <div id="login-form" class="auth-form active">
+                            <div class="form-group">
+                                <label for="login-email">Email</label>
+                                <input type="email" id="login-email" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="login-password">Password</label>
+                                <input type="password" id="login-password" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <button id="login-btn" class="btn btn-primary btn-block">Sign In</button>
+                            </div>
+                            
+                            <div class="divider">
+                                <span>OR</span>
+                            </div>
+                            
+                            <div class="form-group">
+                                <button id="google-login-btn" class="btn btn-outline btn-block">
+                                    <i class="fab fa-google"></i> Sign In with Google
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div id="register-form" class="auth-form">
+                            <div class="form-group">
+                                <label for="register-name">Full Name</label>
+                                <input type="text" id="register-name" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="register-email">Email</label>
+                                <input type="email" id="register-email" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="register-password">Password</label>
+                                <input type="password" id="register-password" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>I am a:</label>
+                                <div class="radio-group">
+                                    <label class="radio">
+                                        <input type="radio" name="user-type" value="client" checked>
+                                        <span>Client</span>
+                                    </label>
+                                    <label class="radio">
+                                        <input type="radio" name="user-type" value="trainer">
+                                        <span>Trainer</span>
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <button id="register-btn" class="btn btn-primary btn-block">Create Account</button>
+                            </div>
+
+                            <div class="divider"><span>OR</span></div>
+
+                            <div class="form-group">
+                                <button id="google-register-btn" class="btn btn-outline btn-block">
+                                    <i class="fab fa-google"></i> Register with Google
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Trainer Dashboard -->
+        <div id="trainer-view" class="view">
+            <nav class="navbar">
+                <div class="navbar-brand">
+                    <i class="fas fa-dumbbell"></i>
+                    <span>Workout Pro</span>
+                </div>
+                
+                <div class="navbar-menu">
+                    <a href="#" class="navbar-item active" data-section="dashboard">
+                        <i class="fas fa-tachometer-alt"></i> Dashboard
+                    </a>
+                    <a href="#" class="navbar-item" data-section="clients">
+                        <i class="fas fa-users"></i> Clients
+                    </a>
+                    <a href="#" class="navbar-item" data-section="plans">
+                        <i class="fas fa-clipboard-list"></i> Plans
+                    </a>
+                    <a href="#" class="navbar-item" data-section="videos">
+                        <i class="fas fa-video"></i> Video Library
+                    </a>
+                </div>
+                
+                <div class="navbar-user">
+                    <div class="user-info">
+                        <span class="user-name">Trainer Name</span>
+                        <span class="user-role">Trainer</span>
+                    </div>
+                    <div class="avatar">
+                        <img src="assets/avatar-placeholder.jpg" alt="User Avatar">
+                        <div class="dropdown">
+                            <ul>
+                                <li><a href="#" data-action="profile"><i class="fas fa-user"></i> Profile</a></li>
+                                <li><a href="#" data-action="settings"><i class="fas fa-cog"></i> Settings</a></li>
+                                <li><a href="#" id="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+            
+            <main class="main-content">
+                <!-- Trainer Dashboard Section -->
+                <section id="dashboard-section" class="content-section active">
+                    <header class="section-header">
+                        <h2>Trainer Dashboard</h2>
+                        <div class="actions">
+                            <button class="btn btn-primary">
+                                <i class="fas fa-plus"></i> New Plan
+                            </button>
+                        </div>
+                    </header>
+                    
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3>Active Clients</h3>
+                                <p class="stat-value" id="active-clients-count">0</p>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-clipboard-list"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3>Active Plans</h3>
+                                <p class="stat-value" id="active-plans-count">0</p>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3>Completed Workouts</h3>
+                                <p class="stat-value" id="completed-workouts-count">0</p>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-video"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3>Videos Used</h3>
+                                <p class="stat-value" id="videos-used-count">0</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="dashboard-panels">
+                        <div class="panel">
+                            <h3>Recent Client Activity</h3>
+                            <div class="activity-feed" id="client-activity-feed">
+                                <!-- Activity items will be populated here -->
+                                <div class="empty-state">
+                                    <i class="fas fa-info-circle"></i>
+                                    <p>No recent activity</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="panel">
+                            <h3>Recent Plans</h3>
+                            <div class="recent-plans" id="recent-plans-list">
+                                <!-- Recent plans will be populated here -->
+                                <div class="empty-state">
+                                    <i class="fas fa-info-circle"></i>
+                                    <p>No recent plans</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                
+                <!-- Clients Section -->
+                <section id="clients-section" class="content-section">
+                    <header class="section-header">
+                        <h2>My Clients</h2>
+                        <div class="actions">
+                            <div class="search-box">
+                                <input type="text" placeholder="Search clients...">
+                                <i class="fas fa-search"></i>
+                            </div>
+                            <button class="btn btn-primary" id="add-client-btn">
+                                <i class="fas fa-plus"></i> Add Client
+                            </button>
+                        </div>
+                    </header>
+                    
+                    <div class="table-container">
+                        <table class="data-table" id="clients-table">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Active Plans</th>
+                                    <th>Progress</th>
+                                    <th>Last Active</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Client rows will be populated here -->
+                            </tbody>
+                        </table>
+                        
+                        <div class="empty-state" id="clients-empty-state">
+                            <i class="fas fa-users"></i>
+                            <h3>No clients yet</h3>
+                            <p>Add your first client to get started</p>
+                            <button class="btn btn-primary" id="add-first-client-btn">
+                                <i class="fas fa-plus"></i> Add Client
+                            </button>
+                        </div>
+                        
+                        <div class="pagination">
+                            <button class="pagination-btn" data-action="prev">
+                                <i class="fas fa-chevron-left"></i>
+                            </button>
+                            <div class="pagination-info">Page <span id="current-page">1</span> of <span id="total-pages">1</span></div>
+                            <button class="pagination-btn" data-action="next">
+                                <i class="fas fa-chevron-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                </section>
+                
+                <!-- Plans Section -->
+                <section id="plans-section" class="content-section">
+                    <header class="section-header">
+                        <h2>Workout Plans</h2>
+                        <div class="actions">
+                            <div class="search-box">
+                                <input type="text" placeholder="Search plans...">
+                                <i class="fas fa-search"></i>
+                            </div>
+                            <button class="btn btn-primary" id="create-plan-btn">
+                                <i class="fas fa-plus"></i> Create Plan
+                            </button>
+                        </div>
+                    </header>
+                    
+                    <div class="filter-bar">
+                        <div class="filter-group">
+                            <label>Status:</label>
+                            <select id="plan-status-filter">
+                                <option value="all">All</option>
+                                <option value="active">Active</option>
+                                <option value="draft">Draft</option>
+                                <option value="completed">Completed</option>
+                            </select>
+                        </div>
+                        
+                        <div class="filter-group">
+                            <label>Client:</label>
+                            <select id="plan-client-filter">
+                                <option value="all">All Clients</option>
+                                <!-- Client options will be populated here -->
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="plans-grid" id="plans-grid">
+                        <!-- Plan cards will be populated here -->
+                    </div>
+                    
+                    <div class="empty-state" id="plans-empty-state">
+                        <i class="fas fa-clipboard-list"></i>
+                        <h3>No plans yet</h3>
+                        <p>Create your first workout plan</p>
+                        <button class="btn btn-primary" id="create-first-plan-btn">
+                            <i class="fas fa-plus"></i> Create Plan
+                        </button>
+                    </div>
+                    
+                    <div class="pagination">
+                        <button class="pagination-btn" data-action="prev">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <div class="pagination-info">Page <span id="plans-current-page">1</span> of <span id="plans-total-pages">1</span></div>
+                        <button class="pagination-btn" data-action="next">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </section>
+                
+                <!-- Video Library Section -->
+                <section id="videos-section" class="content-section">
+                    <header class="section-header">
+                        <h2>Video Library</h2>
+                        <div class="actions">
+                            <div class="search-box">
+                                <input type="text" placeholder="Search videos...">
+                                <i class="fas fa-search"></i>
+                            </div>
+                        </div>
+                    </header>
+                    
+                    <div class="filter-bar">
+                        <div class="filter-group">
+                            <label>Category:</label>
+                            <select id="video-category-filter">
+                                <option value="all">All Categories</option>
+                                <!-- Category options will be populated here -->
+                            </select>
+                        </div>
+                        
+                        <div class="filter-group">
+                            <label>Difficulty:</label>
+                            <select id="video-difficulty-filter">
+                                <option value="all">All Levels</option>
+                                <option value="beginner">Beginner</option>
+                                <option value="intermediate">Intermediate</option>
+                                <option value="advanced">Advanced</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="videos-grid" id="videos-grid">
+                        <!-- Video cards will be populated here -->
+                    </div>
+                </section>
+            </main>
+            
+            <!-- Modals -->
+            <div class="modal" id="add-client-modal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3>Add New Client</h3>
+                        <button class="modal-close">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="client-email">Client Email</label>
+                            <input type="email" id="client-email" placeholder="Enter client email">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary modal-close-btn">Cancel</button>
+                        <button class="btn btn-primary" id="add-client-submit">Add Client</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="modal" id="create-plan-modal">
+                <div class="modal-content modal-lg">
+                    <div class="modal-header">
+                        <h3>Create Workout Plan</h3>
+                        <button class="modal-close">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="plan-title">Plan Title</label>
+                            <input type="text" id="plan-title" placeholder="Enter plan title">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="plan-client">Client</label>
+                            <select id="plan-client">
+                                <!-- Client options will be populated here -->
+                            </select>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="plan-start-date">Start Date</label>
+                                <input type="date" id="plan-start-date">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="plan-end-date">End Date</label>
+                                <input type="date" id="plan-end-date">
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="plan-description">Description</label>
+                            <textarea id="plan-description" rows="3" placeholder="Enter plan description"></textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="plan-template">Template (Optional)</label>
+                            <select id="plan-template">
+                                <option value="">None (Create Custom Plan)</option>
+                                <!-- Template options will be populated here -->
+                            </select>
+                        </div>
+                        
+                        <hr>
+                        
+                        <h4>Plan Structure</h4>
+                        <div id="plan-structure" class="plan-structure">
+                            <!-- Plan sections will be rendered here -->
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-outline" id="save-template-btn" type="button">
+                            <i class="fas fa-save"></i> Save as Template
+                        </button>
+                        <button class="btn btn-secondary modal-close-btn">Cancel</button>
+                        <button class="btn btn-primary" id="create-plan-submit">Create Plan</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Client Dashboard -->
+        <div id="client-view" class="view">
+            <nav class="navbar">
+                <div class="navbar-brand">
+                    <i class="fas fa-dumbbell"></i>
+                    <span>Workout Pro</span>
+                </div>
+                
+                <div class="navbar-menu">
+                    <a href="#" class="navbar-item active" data-section="client-dashboard">
+                        <i class="fas fa-tachometer-alt"></i> Dashboard
+                    </a>
+                    <a href="#" class="navbar-item" data-section="client-plans">
+                        <i class="fas fa-clipboard-list"></i> My Plans
+                    </a>
+                    <a href="#" class="navbar-item" data-section="client-progress">
+                        <i class="fas fa-chart-line"></i> Progress
+                    </a>
+                </div>
+                
+                <div class="navbar-user">
+                    <div class="user-info">
+                        <span class="user-name">Client Name</span>
+                        <span class="user-role">Client</span>
+                    </div>
+                    <div class="avatar">
+                        <img src="assets/avatar-placeholder.jpg" alt="User Avatar">
+                        <div class="dropdown">
+                            <ul>
+                                <li><a href="#" data-action="profile"><i class="fas fa-user"></i> Profile</a></li>
+                                <li><a href="#" data-action="settings"><i class="fas fa-cog"></i> Settings</a></li>
+                                <li><a href="#" id="client-logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+            
+            <main class="main-content">
+                <!-- Client Dashboard Section -->
+                <section id="client-dashboard-section" class="content-section active">
+                    <header class="section-header">
+                        <h2>My Dashboard</h2>
+                    </header>
+                    
+                    <div class="welcome-banner">
+                        <div class="welcome-message">
+                            <h3>Welcome, <span class="client-name">Client</span>!</h3>
+                            <p>Here's your fitness progress summary</p>
+                        </div>
+                    </div>
+                    
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-calendar-check"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3>Active Plans</h3>
+                                <p class="stat-value" id="client-active-plans">0</p>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-tasks"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3>Workouts Completed</h3>
+                                <p class="stat-value" id="client-completed-workouts">0</p>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3>Total Workout Time</h3>
+                                <p class="stat-value" id="client-workout-time">0 min</p>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-user-friends"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3>My Trainers</h3>
+                                <p class="stat-value" id="client-trainers-count">0</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="dashboard-panels">
+                        <div class="panel">
+                            <h3>Today's Workouts</h3>
+                            <div id="todays-workouts">
+                                <!-- Today's workouts will be populated here -->
+                                <div class="empty-state">
+                                    <i class="fas fa-calendar"></i>
+                                    <p>No workouts scheduled for today</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="panel">
+                            <h3>My Trainers</h3>
+                            <div id="client-trainers">
+                                <!-- Trainers will be populated here -->
+                                <div class="empty-state">
+                                    <i class="fas fa-user-friends"></i>
+                                    <p>No trainers assigned yet</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                
+                <!-- Client Plans Section -->
+                <section id="client-plans-section" class="content-section">
+                    <header class="section-header">
+                        <h2>My Plans</h2>
+                    </header>
+                    
+                    <div class="filter-bar">
+                        <div class="filter-group">
+                            <label>Status:</label>
+                            <select id="client-plan-status-filter">
+                                <option value="all">All Plans</option>
+                                <option value="active" selected>Active</option>
+                                <option value="completed">Completed</option>
+                            </select>
+                        </div>
+                        
+                        <div class="filter-group">
+                            <label>Trainer:</label>
+                            <select id="client-plan-trainer-filter">
+                                <option value="all">All Trainers</option>
+                                <!-- Trainer options will be populated here -->
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="plans-grid" id="client-plans-grid">
+                        <!-- Plan cards will be populated here -->
+                    </div>
+                    
+                    <div class="empty-state" id="client-plans-empty">
+                        <i class="fas fa-clipboard-list"></i>
+                        <h3>No plans available</h3>
+                        <p>Your trainer will create plans for you</p>
+                    </div>
+                </section>
+                
+                <!-- Client Progress Section -->
+                <section id="client-progress-section" class="content-section">
+                    <header class="section-header">
+                        <h2>My Progress</h2>
+                    </header>
+                    
+                    <div class="progress-charts">
+                        <div class="chart-panel">
+                            <h3>Weekly Activity</h3>
+                            <div class="chart-container">
+                                <canvas id="weekly-activity-chart"></canvas>
+                            </div>
+                        </div>
+                        
+                        <div class="chart-panel">
+                            <h3>Workout Distribution</h3>
+                            <div class="chart-container">
+                                <canvas id="workout-distribution-chart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="progress-history">
+                        <h3>Workout History</h3>
+                        <div class="table-container">
+                            <table class="data-table" id="workout-history-table">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Workout</th>
+                                        <th>Duration</th>
+                                        <th>Plan</th>
+                                        <th>Trainer</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Workout history rows will be populated here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+            </main>
+            
+            <!-- Client Modals -->
+            <div class="modal" id="workout-details-modal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3>Workout Details</h3>
+                        <button class="modal-close">&times;</button>
+                    </div>
+                    <div class="modal-body" id="workout-details-content">
+                        <!-- Workout details will be populated here -->
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary modal-close-btn">Close</button>
+                        <button class="btn btn-primary" id="complete-workout-btn">Mark as Complete</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="toast-container" id="toast-container"></div>
+    
+    <!-- Video Modal -->
+    <div id="video-modal" class="modal video-modal">
+        <div class="modal-content modal-lg">
+            <div class="modal-header">
+                <h3 id="video-title">Video Title</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="video-container">
+                    <iframe id="video-frame" allowfullscreen></iframe>
+                </div>
+                <div class="video-info">
+                    <div class="video-metadata">
+                        <div class="meta-item">
+                            <span class="meta-label">Category:</span>
+                            <span id="video-category">Category</span>
+                        </div>
+                        <div class="meta-item">
+                            <span class="meta-label">Duration:</span>
+                            <span id="video-duration">Duration</span>
+                        </div>
+                        <div class="meta-item">
+                            <span class="meta-label">Difficulty:</span>
+                            <span id="video-difficulty">Difficulty</span>
+                        </div>
+                    </div>
+                    <div class="video-description" id="video-description">
+                        Video description will appear here.
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary modal-close-btn">Close</button>
+                <a href="#" id="open-external-btn" target="_blank" class="btn btn-primary">
+                    <i class="fas fa-external-link-alt"></i> Open in Google Drive
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Section Modal -->
+    <div id="section-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Plan Section</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="section-index" value="-1">
+                
+                <div class="form-group">
+                    <label for="section-title">Section Title</label>
+                    <input type="text" id="section-title" placeholder="Enter section title">
+                </div>
+                
+                <div class="form-group">
+                    <label for="section-description">Description</label>
+                    <textarea id="section-description" rows="3" placeholder="Enter section description"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="section-order">Order</label>
+                    <input type="number" id="section-order" min="0" value="0">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary modal-close-btn">Cancel</button>
+                <button class="btn btn-primary" id="save-section-btn">Save Section</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Workout Modal -->
+    <div id="workout-modal" class="modal">
+        <div class="modal-content modal-lg">
+            <div class="modal-header">
+                <h3>Add Workout</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="workout-section-index" value="-1">
+                <input type="hidden" id="workout-index" value="-1">
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="workout-day">Day</label>
+                        <input type="number" id="workout-day" min="1" value="1">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="workout-order">Order in Day</label>
+                        <input type="number" id="workout-order" min="1" value="1">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Video</label>
+                    <div class="search-box">
+                        <input type="text" id="plan-video-search" placeholder="Search for videos...">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <input type="hidden" id="workout-video" value="">
+                    <div id="video-search-results" class="search-results"></div>
+                    <div class="selected-video">
+                        <span id="selected-video-title"></span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="workout-title">Title (optional override)</label>
+                    <input type="text" id="workout-title" placeholder="Enter workout title">
+                </div>
+                
+                <div class="form-group">
+                    <label for="workout-description">Instructions/Notes</label>
+                    <textarea id="workout-description" rows="3" placeholder="Enter workout instructions"></textarea>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="workout-duration">Duration (minutes)</label>
+                        <input type="number" id="workout-duration" min="1">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="workout-sets">Sets</label>
+                        <input type="number" id="workout-sets" min="1">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="workout-reps">Reps</label>
+                        <input type="text" id="workout-reps" placeholder="e.g. 10-12 or 10,8,6">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="workout-intensity">Intensity</label>
+                    <select id="workout-intensity">
+                        <option value="">Select Intensity</option>
+                        <option value="low">Low</option>
+                        <option value="medium">Medium</option>
+                        <option value="high">High</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary modal-close-btn">Cancel</button>
+                <button class="btn btn-primary" id="save-workout-btn">Save Workout</button>
+            </div>
+        </div>
+    </div>
+    
+    <script src="/static/js/app.js"></script>
+    <script src="/static/js/plan-template.js"></script>
+    <script>
+        // Initialize plan template manager once app is ready
+        document.addEventListener('DOMContentLoaded', () => {
+            // Wait for app to be initialized
+            setTimeout(() => {
+                if (window.app) {
+                    window.templateManager = new PlanTemplateManager(window.app);
+                }
+            }, 1000);
+        });
+    </script>
+</body>
+</html>
