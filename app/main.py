@@ -1,11 +1,11 @@
 """
-FastAPI backend for Fitness Curator.
-Provides REST API endpoints for video management, search, user management, and workout plans.
+FastAPI backend for Fitness Curator - Video Search Module Only.
+Provides REST API endpoints for video management and search.
 """
 
-from fastapi import FastAPI, HTTPException, Depends, UploadFile, File, Form, Request
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import HTMLResponse, JSONResponse, FileResponse
+from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
@@ -13,24 +13,14 @@ from typing import List, Optional, Dict, Any
 import sys
 from pathlib import Path
 import logging
-import os
 
 # Add the parent directory to Python path
 sys.path.append(str(Path(__file__).parent.parent))
 
 # Import database models and utilities
-from app.database import DatabaseManager, WorkoutVideoModel, init_database, Base, engine
+from app.database import DatabaseManager, WorkoutVideoModel, init_database
 from app.search_engine_db import DatabaseSearchEngine
 from app.utils import extract_keywords, extract_equipment_from_title, normalize_category
-
-# Import models for database initialization
-from app.models.user import User, ClientTrainerRelationship
-from app.models.plan import WorkoutPlan, PlanTemplate, PlanSection, PlanWorkout
-
-# Import routers
-from app.api.auth_router import router as auth_router
-from app.api.user_router import router as user_router
-from app.api.plan_router import router as plan_router
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -38,9 +28,9 @@ logger = logging.getLogger(__name__)
 
 # Initialize FastAPI app
 app = FastAPI(
-    title="Fitness Curator",
-    description="Intelligent fitness system with workout video search and trainer-client support",
-    version="3.0.0"
+    title="Fitness Curator - Video Search",
+    description="Intelligent workout video search system with TF-IDF, keyword, and fuzzy matching",
+    version="1.0.0"
 )
 
 # Get the current file's directory
@@ -61,17 +51,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Initialize database with all models and create tables
-def init_all_database():
-    # Create all tables if they don't exist
-    Base.metadata.create_all(bind=engine)
-    # Initialize the original database
-    init_database()
-    
-    logger.info("Database initialized with all models")
-
-# Run initialization
-init_all_database()
+# Initialize database
+init_database()
 db_manager = DatabaseManager()
 search_engine = DatabaseSearchEngine(db_manager)
 
@@ -105,27 +86,15 @@ class BulkVideoCreate(BaseModel):
 
 # API Routes
 
-# Include our new routers
-app.include_router(auth_router)
-app.include_router(user_router)
-app.include_router(plan_router)
-
-
-
 @app.get("/")
 async def root(request: Request):
-    """Root endpoint - serves the dashboard SPA."""
-    return templates.TemplateResponse("index.html", {"request": request})
-
-@app.get("/dashboard")
-async def dashboard(request: Request):
-    """Dashboard endpoint - serves the SPA for authenticated users."""
+    """Root endpoint - serves the main page."""
     return templates.TemplateResponse("index.html", {"request": request})
 
 @app.get("/api")
 async def api_info():
     """API information endpoint."""
-    return {"message": "Fitness Curator API", "version": "3.0.0"}
+    return {"message": "Fitness Curator Video Search API", "version": "1.0.0"}
 
 @app.get("/health")
 async def health_check():
@@ -347,7 +316,7 @@ async def get_stats():
             "database": db_stats,
             "search_engine": search_stats,
             "system": {
-                "api_version": "2.0.0",
+                "api_version": "1.0.0",
                 "database_type": "SQLite"
             }
         }

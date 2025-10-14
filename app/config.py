@@ -10,7 +10,22 @@ BASE_DIR = Path(__file__).parent.parent
 APP_DIR = Path(__file__).parent
 
 # Database
-DATABASE_URL = os.getenv("DATABASE_URL", f"sqlite:///{BASE_DIR}/database.sqlite3")
+# Prefer explicit DB path if provided, else fall back to project DB
+DEFAULT_DB_PATH = str(BASE_DIR / "workout_videos.db")
+EXTERNAL_DB_PATH = "/home/streamoid/Desktop/Raghav/Personal/data/workout_videos.db"
+
+# If the external DB exists, use it by default unless DATABASE_URL is set
+if os.getenv("DATABASE_URL"):
+    DATABASE_URL = os.getenv("DATABASE_URL")
+else:
+    if os.path.exists(EXTERNAL_DB_PATH):
+        # Absolute sqlite path requires four slashes
+        DATABASE_URL = f"sqlite:////{EXTERNAL_DB_PATH}"
+    else:
+        DATABASE_URL = f"sqlite:///{DEFAULT_DB_PATH}"
+
+print(f"Using database: {DATABASE_URL}")
+
 TEST_DATABASE_URL = os.getenv("TEST_DATABASE_URL", "sqlite:///./test_database.sqlite3")
 
 # Security

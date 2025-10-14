@@ -3,840 +3,738 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Workout Dashboard | Trainer & Client Portal</title>
-    <link rel="stylesheet" href="/static/css/styles.css">
+    <title>Workout Video Search</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+        
+        .header h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        
+        .search-container {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            margin-bottom: 30px;
+        }
+        
+        .search-box {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .search-input {
+            flex: 1;
+            padding: 15px 20px;
+            font-size: 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            transition: border-color 0.3s;
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .search-btn {
+            padding: 15px 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .search-btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .filters {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .filter-group {
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .filter-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #333;
+        }
+        
+        .filter-group select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        
+        .stats {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #667eea;
+        }
+        
+        .stat-label {
+            color: #666;
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+        
+        .results-container {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        
+        .results-header {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        
+        .results-header h2 {
+            color: #333;
+            font-size: 1.5rem;
+        }
+        
+        .video-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .video-card {
+            border: 2px solid #f0f0f0;
+            border-radius: 12px;
+            padding: 20px;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        
+        .video-card:hover {
+            border-color: #667eea;
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.2);
+        }
+        
+        .video-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .video-meta {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 10px;
+        }
+        
+        .video-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+        
+        .badge-category {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+        
+        .badge-difficulty {
+            background: #fff3e0;
+            color: #f57c00;
+        }
+        
+        .badge-duration {
+            background: #f3e5f5;
+            color: #7b1fa2;
+        }
+        
+        .video-description {
+            color: #666;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            margin-top: 10px;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+        
+        .loading i {
+            font-size: 3rem;
+            color: #667eea;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            100% { transform: rotate(360deg); }
+        }
+        
+        .no-results {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+        
+        .no-results i {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+        
+        .error-message {
+            background: #ffebee;
+            color: #c62828;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        
+        .video-score {
+            display: inline-block;
+            padding: 4px 10px;
+            background: #4caf50;
+            color: white;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        /* Video Modal */
+        .video-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .video-modal.active {
+            display: flex;
+        }
+        
+        .video-modal-content {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            max-width: 800px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+        }
+        
+        .video-modal-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: #f44336;
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .video-modal-close:hover {
+            background: #d32f2f;
+        }
+        
+        .video-player {
+            width: 100%;
+            aspect-ratio: 16/9;
+            background: #000;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+    </style>
 </head>
 <body>
-    <div id="app">
-        <!-- Login Screen (initial view) -->
-        <div id="login-view" class="view active">
-            <div class="auth-container">
-                <div class="auth-card">
-                    <div class="auth-header">
-                        <h1><i class="fas fa-dumbbell"></i> Workout Pro</h1>
-                        <p>Sign in to access your dashboard</p>
-                    </div>
-                    
-                    <div class="auth-body">
-                        <div class="auth-tabs">
-                            <button class="auth-tab active" data-tab="login">Sign In</button>
-                            <button class="auth-tab" data-tab="register">Register</button>
-                        </div>
-                        
-                        <div id="login-form" class="auth-form active">
-                            <div class="form-group">
-                                <label for="login-email">Email</label>
-                                <input type="email" id="login-email" required>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="login-password">Password</label>
-                                <input type="password" id="login-password" required>
-                            </div>
-                            
-                            <div class="form-group">
-                                <button id="login-btn" class="btn btn-primary btn-block">Sign In</button>
-                            </div>
-                            
-                            <div class="divider">
-                                <span>OR</span>
-                            </div>
-                            
-                            <div class="form-group">
-                                <button id="google-login-btn" class="btn btn-outline btn-block">
-                                    <i class="fab fa-google"></i> Sign In with Google
-                                </button>
-                            </div>
-                        </div>
-                        
-                        <div id="register-form" class="auth-form">
-                            <div class="form-group">
-                                <label for="register-name">Full Name</label>
-                                <input type="text" id="register-name" required>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="register-email">Email</label>
-                                <input type="email" id="register-email" required>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="register-password">Password</label>
-                                <input type="password" id="register-password" required>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label>I am a:</label>
-                                <div class="radio-group">
-                                    <label class="radio">
-                                        <input type="radio" name="user-type" value="client" checked>
-                                        <span>Client</span>
-                                    </label>
-                                    <label class="radio">
-                                        <input type="radio" name="user-type" value="trainer">
-                                        <span>Trainer</span>
-                                    </label>
-                                </div>
-                            </div>
-                            
-                            <div class="form-group">
-                                <button id="register-btn" class="btn btn-primary btn-block">Create Account</button>
-                            </div>
-
-                            <div class="divider"><span>OR</span></div>
-
-                            <div class="form-group">
-                                <button id="google-register-btn" class="btn btn-outline btn-block">
-                                    <i class="fab fa-google"></i> Register with Google
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-dumbbell"></i> Workout Video Search</h1>
+            <p>Find the perfect workout videos with advanced search</p>
         </div>
         
-        <!-- Trainer Dashboard -->
-        <div id="trainer-view" class="view">
-            <nav class="navbar">
-                <div class="navbar-brand">
-                    <i class="fas fa-dumbbell"></i>
-                    <span>Workout Pro</span>
-                </div>
-                
-                <div class="navbar-menu">
-                    <a href="#" class="navbar-item active" data-section="dashboard">
-                        <i class="fas fa-tachometer-alt"></i> Dashboard
-                    </a>
-                    <a href="#" class="navbar-item" data-section="clients">
-                        <i class="fas fa-users"></i> Clients
-                    </a>
-                    <a href="#" class="navbar-item" data-section="plans">
-                        <i class="fas fa-clipboard-list"></i> Plans
-                    </a>
-                    <a href="#" class="navbar-item" data-section="videos">
-                        <i class="fas fa-video"></i> Video Library
-                    </a>
-                </div>
-                
-                <div class="navbar-user">
-                    <div class="user-info">
-                        <span class="user-name">Trainer Name</span>
-                        <span class="user-role">Trainer</span>
-                    </div>
-                    <div class="avatar">
-                        <img src="assets/avatar-placeholder.jpg" alt="User Avatar">
-                        <div class="dropdown">
-                            <ul>
-                                <li><a href="#" data-action="profile"><i class="fas fa-user"></i> Profile</a></li>
-                                <li><a href="#" data-action="settings"><i class="fas fa-cog"></i> Settings</a></li>
-                                <li><a href="#" id="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </nav>
-            
-            <main class="main-content">
-                <!-- Trainer Dashboard Section -->
-                <section id="dashboard-section" class="content-section active">
-                    <header class="section-header">
-                        <h2>Trainer Dashboard</h2>
-                        <div class="actions">
-                            <button class="btn btn-primary">
-                                <i class="fas fa-plus"></i> New Plan
-                            </button>
-                        </div>
-                    </header>
-                    
-                    <div class="stats-grid">
-                        <div class="stat-card">
-                            <div class="stat-icon">
-                                <i class="fas fa-users"></i>
-                            </div>
-                            <div class="stat-info">
-                                <h3>Active Clients</h3>
-                                <p class="stat-value" id="active-clients-count">0</p>
-                            </div>
-                        </div>
-                        
-                        <div class="stat-card">
-                            <div class="stat-icon">
-                                <i class="fas fa-clipboard-list"></i>
-                            </div>
-                            <div class="stat-info">
-                                <h3>Active Plans</h3>
-                                <p class="stat-value" id="active-plans-count">0</p>
-                            </div>
-                        </div>
-                        
-                        <div class="stat-card">
-                            <div class="stat-icon">
-                                <i class="fas fa-check-circle"></i>
-                            </div>
-                            <div class="stat-info">
-                                <h3>Completed Workouts</h3>
-                                <p class="stat-value" id="completed-workouts-count">0</p>
-                            </div>
-                        </div>
-                        
-                        <div class="stat-card">
-                            <div class="stat-icon">
-                                <i class="fas fa-video"></i>
-                            </div>
-                            <div class="stat-info">
-                                <h3>Videos Used</h3>
-                                <p class="stat-value" id="videos-used-count">0</p>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="dashboard-panels">
-                        <div class="panel">
-                            <h3>Recent Client Activity</h3>
-                            <div class="activity-feed" id="client-activity-feed">
-                                <!-- Activity items will be populated here -->
-                                <div class="empty-state">
-                                    <i class="fas fa-info-circle"></i>
-                                    <p>No recent activity</p>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="panel">
-                            <h3>Recent Plans</h3>
-                            <div class="recent-plans" id="recent-plans-list">
-                                <!-- Recent plans will be populated here -->
-                                <div class="empty-state">
-                                    <i class="fas fa-info-circle"></i>
-                                    <p>No recent plans</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-                
-                <!-- Clients Section -->
-                <section id="clients-section" class="content-section">
-                    <header class="section-header">
-                        <h2>My Clients</h2>
-                        <div class="actions">
-                            <div class="search-box">
-                                <input type="text" placeholder="Search clients...">
-                                <i class="fas fa-search"></i>
-                            </div>
-                            <button class="btn btn-primary" id="add-client-btn">
-                                <i class="fas fa-plus"></i> Add Client
-                            </button>
-                        </div>
-                    </header>
-                    
-                    <div class="table-container">
-                        <table class="data-table" id="clients-table">
-                            <thead>
-                                <tr>
-                                    <th>Name</th>
-                                    <th>Email</th>
-                                    <th>Active Plans</th>
-                                    <th>Progress</th>
-                                    <th>Last Active</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <!-- Client rows will be populated here -->
-                            </tbody>
-                        </table>
-                        
-                        <div class="empty-state" id="clients-empty-state">
-                            <i class="fas fa-users"></i>
-                            <h3>No clients yet</h3>
-                            <p>Add your first client to get started</p>
-                            <button class="btn btn-primary" id="add-first-client-btn">
-                                <i class="fas fa-plus"></i> Add Client
-                            </button>
-                        </div>
-                        
-                        <div class="pagination">
-                            <button class="pagination-btn" data-action="prev">
-                                <i class="fas fa-chevron-left"></i>
-                            </button>
-                            <div class="pagination-info">Page <span id="current-page">1</span> of <span id="total-pages">1</span></div>
-                            <button class="pagination-btn" data-action="next">
-                                <i class="fas fa-chevron-right"></i>
-                            </button>
-                        </div>
-                    </div>
-                </section>
-                
-                <!-- Plans Section -->
-                <section id="plans-section" class="content-section">
-                    <header class="section-header">
-                        <h2>Workout Plans</h2>
-                        <div class="actions">
-                            <div class="search-box">
-                                <input type="text" placeholder="Search plans...">
-                                <i class="fas fa-search"></i>
-                            </div>
-                            <button class="btn btn-primary" id="create-plan-btn">
-                                <i class="fas fa-plus"></i> Create Plan
-                            </button>
-                        </div>
-                    </header>
-                    
-                    <div class="filter-bar">
-                        <div class="filter-group">
-                            <label>Status:</label>
-                            <select id="plan-status-filter">
-                                <option value="all">All</option>
-                                <option value="active">Active</option>
-                                <option value="draft">Draft</option>
-                                <option value="completed">Completed</option>
-                            </select>
-                        </div>
-                        
-                        <div class="filter-group">
-                            <label>Client:</label>
-                            <select id="plan-client-filter">
-                                <option value="all">All Clients</option>
-                                <!-- Client options will be populated here -->
-                            </select>
-                        </div>
-                    </div>
-                    
-                    <div class="plans-grid" id="plans-grid">
-                        <!-- Plan cards will be populated here -->
-                    </div>
-                    
-                    <div class="empty-state" id="plans-empty-state">
-                        <i class="fas fa-clipboard-list"></i>
-                        <h3>No plans yet</h3>
-                        <p>Create your first workout plan</p>
-                        <button class="btn btn-primary" id="create-first-plan-btn">
-                            <i class="fas fa-plus"></i> Create Plan
-                        </button>
-                    </div>
-                    
-                    <div class="pagination">
-                        <button class="pagination-btn" data-action="prev">
-                            <i class="fas fa-chevron-left"></i>
-                        </button>
-                        <div class="pagination-info">Page <span id="plans-current-page">1</span> of <span id="plans-total-pages">1</span></div>
-                        <button class="pagination-btn" data-action="next">
-                            <i class="fas fa-chevron-right"></i>
-                        </button>
-                    </div>
-                </section>
-                
-                <!-- Video Library Section -->
-                <section id="videos-section" class="content-section">
-                    <header class="section-header">
-                        <h2>Video Library</h2>
-                        <div class="actions">
-                            <div class="search-box">
-                                <input type="text" placeholder="Search videos...">
-                                <i class="fas fa-search"></i>
-                            </div>
-                        </div>
-                    </header>
-                    
-                    <div class="filter-bar">
-                        <div class="filter-group">
-                            <label>Category:</label>
-                            <select id="video-category-filter">
-                                <option value="all">All Categories</option>
-                                <!-- Category options will be populated here -->
-                            </select>
-                        </div>
-                        
-                        <div class="filter-group">
-                            <label>Difficulty:</label>
-                            <select id="video-difficulty-filter">
-                                <option value="all">All Levels</option>
-                                <option value="beginner">Beginner</option>
-                                <option value="intermediate">Intermediate</option>
-                                <option value="advanced">Advanced</option>
-                            </select>
-                        </div>
-                    </div>
-                    
-                    <div class="videos-grid" id="videos-grid">
-                        <!-- Video cards will be populated here -->
-                    </div>
-                </section>
-            </main>
-            
-            <!-- Modals -->
-            <div class="modal" id="add-client-modal">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h3>Add New Client</h3>
-                        <button class="modal-close">&times;</button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="form-group">
-                            <label for="client-email">Client Email</label>
-                            <input type="email" id="client-email" placeholder="Enter client email">
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button class="btn btn-secondary modal-close-btn">Cancel</button>
-                        <button class="btn btn-primary" id="add-client-submit">Add Client</button>
-                    </div>
-                </div>
+        <div class="search-container">
+            <div class="search-box">
+                <input 
+                    type="text" 
+                    id="search-input" 
+                    class="search-input" 
+                    placeholder="Search for workouts... (e.g., yoga, HIIT, strength training)"
+                    autocomplete="off"
+                >
+                <button id="search-btn" class="search-btn">
+                    <i class="fas fa-search"></i> Search
+                </button>
             </div>
             
-            <div class="modal" id="create-plan-modal">
-                <div class="modal-content modal-lg">
-                    <div class="modal-header">
-                        <h3>Create Workout Plan</h3>
-                        <button class="modal-close">&times;</button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="form-group">
-                            <label for="plan-title">Plan Title</label>
-                            <input type="text" id="plan-title" placeholder="Enter plan title">
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="plan-client">Client</label>
-                            <select id="plan-client">
-                                <!-- Client options will be populated here -->
-                            </select>
-                        </div>
-                        
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="plan-start-date">Start Date</label>
-                                <input type="date" id="plan-start-date">
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="plan-end-date">End Date</label>
-                                <input type="date" id="plan-end-date">
-                            </div>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="plan-description">Description</label>
-                            <textarea id="plan-description" rows="3" placeholder="Enter plan description"></textarea>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="plan-template">Template (Optional)</label>
-                            <select id="plan-template">
-                                <option value="">None (Create Custom Plan)</option>
-                                <!-- Template options will be populated here -->
-                            </select>
-                        </div>
-                        
-                        <hr>
-                        
-                        <h4>Plan Structure</h4>
-                        <div id="plan-structure" class="plan-structure">
-                            <!-- Plan sections will be rendered here -->
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button class="btn btn-outline" id="save-template-btn" type="button">
-                            <i class="fas fa-save"></i> Save as Template
-                        </button>
-                        <button class="btn btn-secondary modal-close-btn">Cancel</button>
-                        <button class="btn btn-primary" id="create-plan-submit">Create Plan</button>
-                    </div>
+            <div class="filters">
+                <div class="filter-group">
+                    <label for="category-filter">Category</label>
+                    <select id="category-filter">
+                        <option value="">All Categories</option>
+                    </select>
                 </div>
-            </div>
-        </div>
-        
-        <!-- Client Dashboard -->
-        <div id="client-view" class="view">
-            <nav class="navbar">
-                <div class="navbar-brand">
-                    <i class="fas fa-dumbbell"></i>
-                    <span>Workout Pro</span>
-                </div>
-                
-                <div class="navbar-menu">
-                    <a href="#" class="navbar-item active" data-section="client-dashboard">
-                        <i class="fas fa-tachometer-alt"></i> Dashboard
-                    </a>
-                    <a href="#" class="navbar-item" data-section="client-plans">
-                        <i class="fas fa-clipboard-list"></i> My Plans
-                    </a>
-                    <a href="#" class="navbar-item" data-section="client-progress">
-                        <i class="fas fa-chart-line"></i> Progress
-                    </a>
-                </div>
-                
-                <div class="navbar-user">
-                    <div class="user-info">
-                        <span class="user-name">Client Name</span>
-                        <span class="user-role">Client</span>
-                    </div>
-                    <div class="avatar">
-                        <img src="assets/avatar-placeholder.jpg" alt="User Avatar">
-                        <div class="dropdown">
-                            <ul>
-                                <li><a href="#" data-action="profile"><i class="fas fa-user"></i> Profile</a></li>
-                                <li><a href="#" data-action="settings"><i class="fas fa-cog"></i> Settings</a></li>
-                                <li><a href="#" id="client-logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </nav>
-            
-            <main class="main-content">
-                <!-- Client Dashboard Section -->
-                <section id="client-dashboard-section" class="content-section active">
-                    <header class="section-header">
-                        <h2>My Dashboard</h2>
-                    </header>
-                    
-                    <div class="welcome-banner">
-                        <div class="welcome-message">
-                            <h3>Welcome, <span class="client-name">Client</span>!</h3>
-                            <p>Here's your fitness progress summary</p>
-                        </div>
-                    </div>
-                    
-                    <div class="stats-grid">
-                        <div class="stat-card">
-                            <div class="stat-icon">
-                                <i class="fas fa-calendar-check"></i>
-                            </div>
-                            <div class="stat-info">
-                                <h3>Active Plans</h3>
-                                <p class="stat-value" id="client-active-plans">0</p>
-                            </div>
-                        </div>
-                        
-                        <div class="stat-card">
-                            <div class="stat-icon">
-                                <i class="fas fa-tasks"></i>
-                            </div>
-                            <div class="stat-info">
-                                <h3>Workouts Completed</h3>
-                                <p class="stat-value" id="client-completed-workouts">0</p>
-                            </div>
-                        </div>
-                        
-                        <div class="stat-card">
-                            <div class="stat-icon">
-                                <i class="fas fa-clock"></i>
-                            </div>
-                            <div class="stat-info">
-                                <h3>Total Workout Time</h3>
-                                <p class="stat-value" id="client-workout-time">0 min</p>
-                            </div>
-                        </div>
-                        
-                        <div class="stat-card">
-                            <div class="stat-icon">
-                                <i class="fas fa-user-friends"></i>
-                            </div>
-                            <div class="stat-info">
-                                <h3>My Trainers</h3>
-                                <p class="stat-value" id="client-trainers-count">0</p>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="dashboard-panels">
-                        <div class="panel">
-                            <h3>Today's Workouts</h3>
-                            <div id="todays-workouts">
-                                <!-- Today's workouts will be populated here -->
-                                <div class="empty-state">
-                                    <i class="fas fa-calendar"></i>
-                                    <p>No workouts scheduled for today</p>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="panel">
-                            <h3>My Trainers</h3>
-                            <div id="client-trainers">
-                                <!-- Trainers will be populated here -->
-                                <div class="empty-state">
-                                    <i class="fas fa-user-friends"></i>
-                                    <p>No trainers assigned yet</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-                
-                <!-- Client Plans Section -->
-                <section id="client-plans-section" class="content-section">
-                    <header class="section-header">
-                        <h2>My Plans</h2>
-                    </header>
-                    
-                    <div class="filter-bar">
-                        <div class="filter-group">
-                            <label>Status:</label>
-                            <select id="client-plan-status-filter">
-                                <option value="all">All Plans</option>
-                                <option value="active" selected>Active</option>
-                                <option value="completed">Completed</option>
-                            </select>
-                        </div>
-                        
-                        <div class="filter-group">
-                            <label>Trainer:</label>
-                            <select id="client-plan-trainer-filter">
-                                <option value="all">All Trainers</option>
-                                <!-- Trainer options will be populated here -->
-                            </select>
-                        </div>
-                    </div>
-                    
-                    <div class="plans-grid" id="client-plans-grid">
-                        <!-- Plan cards will be populated here -->
-                    </div>
-                    
-                    <div class="empty-state" id="client-plans-empty">
-                        <i class="fas fa-clipboard-list"></i>
-                        <h3>No plans available</h3>
-                        <p>Your trainer will create plans for you</p>
-                    </div>
-                </section>
-                
-                <!-- Client Progress Section -->
-                <section id="client-progress-section" class="content-section">
-                    <header class="section-header">
-                        <h2>My Progress</h2>
-                    </header>
-                    
-                    <div class="progress-charts">
-                        <div class="chart-panel">
-                            <h3>Weekly Activity</h3>
-                            <div class="chart-container">
-                                <canvas id="weekly-activity-chart"></canvas>
-                            </div>
-                        </div>
-                        
-                        <div class="chart-panel">
-                            <h3>Workout Distribution</h3>
-                            <div class="chart-container">
-                                <canvas id="workout-distribution-chart"></canvas>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="progress-history">
-                        <h3>Workout History</h3>
-                        <div class="table-container">
-                            <table class="data-table" id="workout-history-table">
-                                <thead>
-                                    <tr>
-                                        <th>Date</th>
-                                        <th>Workout</th>
-                                        <th>Duration</th>
-                                        <th>Plan</th>
-                                        <th>Trainer</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <!-- Workout history rows will be populated here -->
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </section>
-            </main>
-            
-            <!-- Client Modals -->
-            <div class="modal" id="workout-details-modal">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h3>Workout Details</h3>
-                        <button class="modal-close">&times;</button>
-                    </div>
-                    <div class="modal-body" id="workout-details-content">
-                        <!-- Workout details will be populated here -->
-                    </div>
-                    <div class="modal-footer">
-                        <button class="btn btn-secondary modal-close-btn">Close</button>
-                        <button class="btn btn-primary" id="complete-workout-btn">Mark as Complete</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <div class="toast-container" id="toast-container"></div>
-    
-    <!-- Video Modal -->
-    <div id="video-modal" class="modal video-modal">
-        <div class="modal-content modal-lg">
-            <div class="modal-header">
-                <h3 id="video-title">Video Title</h3>
-                <button class="modal-close">&times;</button>
-            </div>
-            <div class="modal-body">
-                <div class="video-container">
-                    <iframe id="video-frame" allowfullscreen></iframe>
-                </div>
-                <div class="video-info">
-                    <div class="video-metadata">
-                        <div class="meta-item">
-                            <span class="meta-label">Category:</span>
-                            <span id="video-category">Category</span>
-                        </div>
-                        <div class="meta-item">
-                            <span class="meta-label">Duration:</span>
-                            <span id="video-duration">Duration</span>
-                        </div>
-                        <div class="meta-item">
-                            <span class="meta-label">Difficulty:</span>
-                            <span id="video-difficulty">Difficulty</span>
-                        </div>
-                    </div>
-                    <div class="video-description" id="video-description">
-                        Video description will appear here.
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-secondary modal-close-btn">Close</button>
-                <a href="#" id="open-external-btn" target="_blank" class="btn btn-primary">
-                    <i class="fas fa-external-link-alt"></i> Open in Google Drive
-                </a>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Section Modal -->
-    <div id="section-modal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>Plan Section</h3>
-                <button class="modal-close">&times;</button>
-            </div>
-            <div class="modal-body">
-                <input type="hidden" id="section-index" value="-1">
-                
-                <div class="form-group">
-                    <label for="section-title">Section Title</label>
-                    <input type="text" id="section-title" placeholder="Enter section title">
-                </div>
-                
-                <div class="form-group">
-                    <label for="section-description">Description</label>
-                    <textarea id="section-description" rows="3" placeholder="Enter section description"></textarea>
-                </div>
-                
-                <div class="form-group">
-                    <label for="section-order">Order</label>
-                    <input type="number" id="section-order" min="0" value="0">
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-secondary modal-close-btn">Cancel</button>
-                <button class="btn btn-primary" id="save-section-btn">Save Section</button>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Workout Modal -->
-    <div id="workout-modal" class="modal">
-        <div class="modal-content modal-lg">
-            <div class="modal-header">
-                <h3>Add Workout</h3>
-                <button class="modal-close">&times;</button>
-            </div>
-            <div class="modal-body">
-                <input type="hidden" id="workout-section-index" value="-1">
-                <input type="hidden" id="workout-index" value="-1">
-                
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="workout-day">Day</label>
-                        <input type="number" id="workout-day" min="1" value="1">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="workout-order">Order in Day</label>
-                        <input type="number" id="workout-order" min="1" value="1">
-                    </div>
-                </div>
-                
-                <div class="form-group">
-                    <label>Video</label>
-                    <div class="search-box">
-                        <input type="text" id="plan-video-search" placeholder="Search for videos...">
-                        <i class="fas fa-search"></i>
-                    </div>
-                    <input type="hidden" id="workout-video" value="">
-                    <div id="video-search-results" class="search-results"></div>
-                    <div class="selected-video">
-                        <span id="selected-video-title"></span>
-                    </div>
-                </div>
-                
-                <div class="form-group">
-                    <label for="workout-title">Title (optional override)</label>
-                    <input type="text" id="workout-title" placeholder="Enter workout title">
-                </div>
-                
-                <div class="form-group">
-                    <label for="workout-description">Instructions/Notes</label>
-                    <textarea id="workout-description" rows="3" placeholder="Enter workout instructions"></textarea>
-                </div>
-                
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="workout-duration">Duration (minutes)</label>
-                        <input type="number" id="workout-duration" min="1">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="workout-sets">Sets</label>
-                        <input type="number" id="workout-sets" min="1">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="workout-reps">Reps</label>
-                        <input type="text" id="workout-reps" placeholder="e.g. 10-12 or 10,8,6">
-                    </div>
-                </div>
-                
-                <div class="form-group">
-                    <label for="workout-intensity">Intensity</label>
-                    <select id="workout-intensity">
-                        <option value="">Select Intensity</option>
-                        <option value="low">Low</option>
-                        <option value="medium">Medium</option>
-                        <option value="high">High</option>
+                <div class="filter-group">
+                    <label for="results-limit">Results</label>
+                    <select id="results-limit">
+                        <option value="10">10 results</option>
+                        <option value="20">20 results</option>
+                        <option value="50">50 results</option>
+                        <option value="100">100 results</option>
                     </select>
                 </div>
             </div>
-            <div class="modal-footer">
-                <button class="btn btn-secondary modal-close-btn">Cancel</button>
-                <button class="btn btn-primary" id="save-workout-btn">Save Workout</button>
+        </div>
+        
+        <div class="stats" id="stats-container">
+            <div class="stat-item">
+                <div class="stat-value" id="total-videos">-</div>
+                <div class="stat-label">Total Videos</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="total-categories">-</div>
+                <div class="stat-label">Categories</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="search-results">0</div>
+                <div class="stat-label">Search Results</div>
+            </div>
+        </div>
+        
+        <div class="results-container">
+            <div class="error-message" id="error-message"></div>
+            
+            <div class="results-header">
+                <h2 id="results-title">All Videos</h2>
+            </div>
+            
+            <div id="results" class="video-grid">
+                <div class="loading">
+                    <i class="fas fa-spinner"></i>
+                    <p>Loading videos...</p>
+                </div>
             </div>
         </div>
     </div>
     
-    <script src="/static/js/app.js"></script>
-    <script src="/static/js/plan-template.js"></script>
+    <!-- Video Modal -->
+    <div id="video-modal" class="video-modal" onclick="if(event.target === this) closeVideoModal()">
+        <div class="video-modal-content">
+            <button class="video-modal-close" onclick="closeVideoModal()">
+                <i class="fas fa-times"></i>
+            </button>
+            <h2 id="modal-video-title" style="margin-bottom: 20px;"></h2>
+            <div id="modal-video-player"></div>
+            <div id="modal-video-meta" class="video-meta" style="margin-bottom: 15px;"></div>
+            <div id="modal-video-description" style="color: #666; line-height: 1.6;"></div>
+        </div>
+    </div>
+    
     <script>
-        // Initialize plan template manager once app is ready
+        // State
+        let allVideos = [];
+        let categories = [];
+        
+        // Initialize
         document.addEventListener('DOMContentLoaded', () => {
-            // Wait for app to be initialized
-            setTimeout(() => {
-                if (window.app) {
-                    window.templateManager = new PlanTemplateManager(window.app);
-                }
-            }, 1000);
+            loadInitialData();
+            setupEventListeners();
         });
+        
+        // Setup event listeners
+        function setupEventListeners() {
+            document.getElementById('search-btn').addEventListener('click', performSearch);
+            document.getElementById('search-input').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') performSearch();
+            });
+            document.getElementById('category-filter').addEventListener('change', performSearch);
+        }
+        
+        // Load initial data
+        async function loadInitialData() {
+            try {
+                // Load all videos
+                const videosResponse = await fetch('/api/videos');
+                allVideos = await videosResponse.json();
+                
+                // Load categories
+                const categoriesResponse = await fetch('/api/categories');
+                const categoriesData = await categoriesResponse.json();
+                categories = categoriesData.categories || [];
+                
+                // Populate category filter
+                const categoryFilter = document.getElementById('category-filter');
+                categories.forEach(cat => {
+                    const option = document.createElement('option');
+                    option.value = cat;
+                    option.textContent = cat;
+                    categoryFilter.appendChild(option);
+                });
+                
+                // Update stats
+                document.getElementById('total-videos').textContent = allVideos.length;
+                document.getElementById('total-categories').textContent = categories.length;
+                
+                // Display all videos initially
+                displayVideos(allVideos);
+                
+            } catch (error) {
+                showError('Failed to load data: ' + error.message);
+            }
+        }
+        
+        // Perform search
+        async function performSearch() {
+            const query = document.getElementById('search-input').value.trim();
+            const category = document.getElementById('category-filter').value;
+            const limit = parseInt(document.getElementById('results-limit').value);
+            
+            // If no query, show all videos (filtered by category if selected)
+            if (!query) {
+                let filtered = allVideos;
+                if (category) {
+                    filtered = allVideos.filter(v => v.category === category);
+                }
+                displayVideos(filtered.slice(0, limit));
+                document.getElementById('results-title').textContent = 
+                    category ? `${category} Videos` : 'All Videos';
+                return;
+            }
+            
+            // Perform search
+            try {
+                showLoading();
+                
+                const response = await fetch('/api/search', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        query: query,
+                        category: category || null,
+                        top_k: limit,
+                        min_score: 0.0
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Search failed');
+                }
+                
+                const data = await response.json();
+                const videos = data.results.map(r => ({
+                    ...r.video,
+                    score: r.score,
+                    method: r.method
+                }));
+                
+                displayVideos(videos);
+                document.getElementById('results-title').textContent = 
+                    `Search Results for "${query}"`;
+                document.getElementById('search-results').textContent = videos.length;
+                
+            } catch (error) {
+                showError('Search failed: ' + error.message);
+            }
+        }
+        
+        // Display videos
+        function displayVideos(videos) {
+            const resultsContainer = document.getElementById('results');
+            
+            if (videos.length === 0) {
+                resultsContainer.innerHTML = `
+                    <div class="no-results">
+                        <i class="fas fa-search"></i>
+                        <h3>No videos found</h3>
+                        <p>Try a different search term or category</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            resultsContainer.innerHTML = videos.map((video, index) => `
+                <div class="video-card" onclick="openVideoModal(${index})" data-video-index="${index}">
+                    <div class="video-title">${video.title}</div>
+                    <div class="video-meta">
+                        ${video.category ? `<span class="video-badge badge-category">${video.category}</span>` : ''}
+                        ${video.difficulty_level ? `<span class="video-badge badge-difficulty">${video.difficulty_level}</span>` : ''}
+                        ${video.duration ? `<span class="video-badge badge-duration">${formatDuration(video.duration)}</span>` : ''}
+                        ${video.score ? `<span class="video-score">${normalizeScore(video.score)}% match</span>` : ''}
+                    </div>
+                    ${video.description ? `<div class="video-description">${video.description}</div>` : ''}
+                    ${video.equipment_needed && video.equipment_needed.length > 0 ? 
+                        `<div class="video-meta" style="margin-top: 10px;">
+                            <small><i class="fas fa-tools"></i> ${video.equipment_needed.join(', ')}</small>
+                        </div>` : ''}
+                </div>
+            `).join('');
+            
+            // Store videos for modal access
+            window.currentVideos = videos;
+        }
+        
+        // Format duration
+        function formatDuration(seconds) {
+            if (!seconds) return '--:--';
+            const mins = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            return `${mins}:${secs.toString().padStart(2, '0')}`;
+        }
+        
+        // Normalize score to 0-100 range
+        function normalizeScore(score) {
+            // Scores from search can be > 1.0, so we normalize them
+            // If score is already between 0-1, multiply by 100
+            // If score is > 1, cap it at 100
+            if (score <= 1.0) {
+                return Math.round(score * 100);
+            } else {
+                // For scores > 1, normalize to 0-100 scale
+                // Assuming max reasonable score is around 3-4
+                return Math.min(100, Math.round((score / 4) * 100));
+            }
+        }
+        
+        // Open video modal
+        function openVideoModal(index) {
+            const video = window.currentVideos[index];
+            if (!video) return;
+            
+            const modal = document.getElementById('video-modal');
+            const modalTitle = document.getElementById('modal-video-title');
+            const modalPlayer = document.getElementById('modal-video-player');
+            const modalDescription = document.getElementById('modal-video-description');
+            const modalMeta = document.getElementById('modal-video-meta');
+            
+            // Set title
+            modalTitle.textContent = video.title;
+            
+            // Set video player
+            const videoSource = video.video_url || video.file_path;
+            
+            if (videoSource) {
+                // Check if it's a Google Drive link
+                if (videoSource.includes('drive.google.com')) {
+                    // Extract file ID from Google Drive URL
+                    const fileIdMatch = videoSource.match(/id=([^&]+)/);
+                    if (fileIdMatch) {
+                        const fileId = fileIdMatch[1];
+                        // Use Google Drive embed URL
+                        modalPlayer.innerHTML = `
+                            <iframe 
+                                src="https://drive.google.com/file/d/${fileId}/preview" 
+                                class="video-player" 
+                                allow="autoplay"
+                                style="border: none;">
+                            </iframe>
+                        `;
+                    } else {
+                        // Fallback: Open in new tab button
+                        modalPlayer.innerHTML = `
+                            <div class="video-player" style="display: flex; align-items: center; justify-content: center; flex-direction: column; color: white;">
+                                <i class="fas fa-video" style="font-size: 3rem; margin-bottom: 20px;"></i>
+                                <p style="margin-bottom: 15px;">Video hosted on Google Drive</p>
+                                <a href="${videoSource}" target="_blank" style="padding: 10px 20px; background: #667eea; color: white; text-decoration: none; border-radius: 8px;">
+                                    <i class="fas fa-external-link-alt"></i> Open in Google Drive
+                                </a>
+                            </div>
+                        `;
+                    }
+                } else {
+                    // Regular video file
+                    modalPlayer.innerHTML = `
+                        <video controls class="video-player">
+                            <source src="${videoSource}" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    `;
+                }
+            } else {
+                modalPlayer.innerHTML = `
+                    <div class="video-player" style="display: flex; align-items: center; justify-content: center; color: white;">
+                        <div style="text-align: center;">
+                            <i class="fas fa-video" style="font-size: 3rem; margin-bottom: 10px;"></i>
+                            <p>Video file not available</p>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            // Set description
+            if (video.description && video.description.trim()) {
+                modalDescription.innerHTML = `<p style="margin-bottom: 15px;">${video.description}</p>`;
+            } else {
+                modalDescription.innerHTML = `<p style="color: #999; font-style: italic;">No description available for this video.</p>`;
+            }
+            
+            // Set metadata - show all available info
+            let metaHTML = '<div style="display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 15px;">';
+            
+            // Always show category
+            if (video.category) {
+                metaHTML += `<span class="video-badge badge-category"><i class="fas fa-tag"></i> ${video.category}</span>`;
+            }
+            
+            // Show difficulty if available
+            if (video.difficulty_level) {
+                metaHTML += `<span class="video-badge badge-difficulty"><i class="fas fa-signal"></i> ${video.difficulty_level}</span>`;
+            }
+            
+            // Show duration if available
+            if (video.duration) {
+                metaHTML += `<span class="video-badge badge-duration"><i class="fas fa-clock"></i> ${formatDuration(video.duration)}</span>`;
+            }
+            
+            metaHTML += '</div>';
+            
+            // Show equipment if available
+            if (video.equipment_needed && video.equipment_needed.length > 0) {
+                metaHTML += `
+                    <div style="margin-bottom: 15px; padding: 10px; background: #f5f5f5; border-radius: 8px;">
+                        <strong><i class="fas fa-tools"></i> Equipment Needed:</strong>
+                        <div style="margin-top: 5px;">${video.equipment_needed.join(', ')}</div>
+                    </div>
+                `;
+            }
+            
+            // Show keywords if available
+            if (video.keywords && video.keywords.length > 0) {
+                metaHTML += `
+                    <div style="margin-bottom: 15px;">
+                        <strong><i class="fas fa-key"></i> Keywords:</strong>
+                        <div style="margin-top: 5px; display: flex; flex-wrap: wrap; gap: 5px;">
+                            ${video.keywords.map(kw => `<span style="background: #e3f2fd; padding: 3px 8px; border-radius: 12px; font-size: 0.85rem;">${kw}</span>`).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+            
+            // Show video ID for reference
+            metaHTML += `<div style="margin-top: 10px; font-size: 0.85rem; color: #999;">Video ID: ${video.id}</div>`;
+            
+            modalMeta.innerHTML = metaHTML;
+            
+            // Show modal
+            modal.classList.add('active');
+        }
+        
+        // Close video modal
+        function closeVideoModal() {
+            const modal = document.getElementById('video-modal');
+            const modalPlayer = document.getElementById('modal-video-player');
+            
+            // Stop video playback
+            modalPlayer.innerHTML = '';
+            
+            // Hide modal
+            modal.classList.remove('active');
+        }
+        
+        // Show loading
+        function showLoading() {
+            document.getElementById('results').innerHTML = `
+                <div class="loading">
+                    <i class="fas fa-spinner"></i>
+                    <p>Searching...</p>
+                </div>
+            `;
+        }
+        
+        // Show error
+        function showError(message) {
+            const errorEl = document.getElementById('error-message');
+            errorEl.textContent = message;
+            errorEl.style.display = 'block';
+            setTimeout(() => {
+                errorEl.style.display = 'none';
+            }, 5000);
+        }
     </script>
 </body>
 </html>
