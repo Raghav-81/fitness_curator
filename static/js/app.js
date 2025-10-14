@@ -92,13 +92,25 @@ class WorkoutDashboardApp {
             });
         });
         
-        // Add client button
+                // Add client buttons (both top action and empty state)
         document.getElementById('add-client-btn')?.addEventListener('click', () => {
+            console.log('Add Client button clicked');
             this.openModal('add-client-modal');
         });
         
-        // Create plan button
+        document.getElementById('add-first-client-btn')?.addEventListener('click', () => {
+            console.log('Add First Client button clicked');
+            this.openModal('add-client-modal');
+        });
+        
+        // Create plan buttons (both top action and empty state)
         document.getElementById('create-plan-btn')?.addEventListener('click', () => {
+            console.log('Create Plan button clicked');
+            this.openModal('create-plan-modal');
+        });
+        
+        document.getElementById('create-first-plan-btn')?.addEventListener('click', () => {
+            console.log('Create First Plan button clicked');
             this.openModal('create-plan-modal');
         });
         
@@ -555,30 +567,176 @@ class WorkoutDashboardApp {
         // This would fetch client's assigned plans
     }
     
-    async loadClientProgress() {
-        console.log('Loading client progress data...');
-        // This would fetch client's progress data
-    }
-    
-    async handleAddClient() {
-        const clientEmail = document.getElementById('client-email').value;
-        if (!clientEmail) {
-            this.showToast('Please enter client email', 'error');
-            return;
+    /**
+     * Open a modal
+     */
+    openModal(modalId) {
+        const modal = document.getElementById(modalId);
+        if (modal) {
+            modal.style.display = 'flex';
         }
-        
-        // This would add a client to trainer's list
-        console.log('Adding client:', clientEmail);
-        this.closeModal('add-client-modal');
-        this.showToast('Client invitation sent', 'success');
     }
-    
-    async handleCreatePlan() {
-        const title = document.getElementById('plan-title').value;
+        
+    /**
+     * Close a modal
+     */
+    closeModal(modalId) {
+        const modal = document.getElementById(modalId);
+        if (modal) {
+            modal.style.display = 'none';
+        }
+    }
+        
+    /**
+     * Show toast notification
+     */
+    showToast(message, type = 'info') {
+        const toastContainer = document.getElementById('toast-container');
+            
+        // Create toast element
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+            
+        // Icon based on type
+        let icon = 'info-circle';
+        if (type === 'success') icon = 'check-circle';
+        if (type === 'error') icon = 'exclamation-circle';
+        if (type === 'warning') icon = 'exclamation-triangle';
+        
+        toast.innerHTML = `
+            <i class="fas fa-${icon} toast-icon"></i>
+            <span>${message}</span>
+        `;
+            
+        // Add to container
+        toastContainer.appendChild(toast);
+            
+        // Remove after 5 seconds
+        setTimeout(() => {
+            toast.remove();
+        }, 5000);
+    }
+        
+/**
+ * Make authenticated API request
+ */
+async apiRequest(endpoint, options = {}) {
+    if (!this.authToken) {
+        throw new Error('Not authenticated');
+    }
+        
+    const defaultOptions = {
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${this.authToken}`
+        }
+    };
+        
+    const mergedOptions = {
+        ...defaultOptions,
+        ...options,
+        headers: {
+            ...defaultOptions.headers,
+            ...options.headers
+        }
+    };
+        
+    const response = await fetch(`${this.apiBaseUrl}${endpoint}`, mergedOptions);
+        
+    if (response.status === 401) {
+        // Token expired or invalid
+        this.handleLogout();
+        throw new Error('Authentication expired. Please login again.');
+    }
+        
+    return response;
+}
+        
+// Section data loading methods would be implemented here
+// For brevity, these are stubbed out for now
+        
+async loadTrainerDashboard() {
+    console.log('Loading trainer dashboard data...');
+    // This would fetch stats, recent activities, etc.
+}
+        
+async loadClientsData() {
+    console.log('Loading clients data...');
+    // This would fetch trainer's clients
+}
+        
+async loadPlansData() {
+    console.log('Loading plans data...');
+    // This would fetch workout plans
+}
+        
+async loadVideosData() {
+    console.log('Loading videos data...');
+    // This would fetch workout videos
+}
+        
+async loadClientDashboard() {
+    console.log('Loading client dashboard data...');
+    // This would fetch client's dashboard data
+}
+        
+async loadClientPlans() {
+    console.log('Loading client plans data...');
+    // This would fetch client's assigned plans
+}
+        
+async loadClientProgress() {
+    console.log('Loading client progress data...');
+    // This would fetch client's progress data
+}
+
+/**
+ * Handle adding a client
+ */
+async handleAddClient() {
+    console.log('handleAddClient() function executing');
+    const email = document.getElementById('client-email').value;
+    if (!email) {
+        this.showToast('Please enter a client email', 'error');
+        return;
+    }
+        
+    try {
+        // For demo, just simulate success
+        console.log(`Adding client with email: ${email}`);
+            
+        // Show success and close modal
+        this.showToast('Client added successfully', 'success');
+        this.closeModal('add-client-modal');
+            
+        // Clear input field for next use
+        document.getElementById('client-email').value = '';
+            
+        // Refresh clients list (would normally make API call)
+        // For demo, just log
+        console.log('Would refresh clients list here');
+            
+    } catch (error) {
+        console.error('Add client error:', error);
+        this.showToast(error.message || 'Failed to add client', 'error');
+    }
+}
+
+/**
+ * Handle creating a plan
+ */
+async handleCreatePlan() {
+    console.log('handleCreatePlan() function executing');
+    const title = document.getElementById('plan-title').value;
+    const clientId = document.getElementById('plan-client').value;
+        
+    if (!title) {
+        this.showToast('Please enter a plan title', 'error');
+        return;
         const clientId = document.getElementById('plan-client').value;
         
-        if (!title || !clientId) {
-            this.showToast('Please fill required fields', 'error');
+        if (!title) {
+            this.showToast('Please enter a plan title', 'error');
             return;
         }
         

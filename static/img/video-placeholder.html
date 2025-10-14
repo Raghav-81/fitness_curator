@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Video Placeholder Generator</title>
+    <style>
+        body { margin: 0; padding: 0; }
+        canvas { display: block; }
+    </style>
+</head>
+<body>
+    <canvas id="placeholderCanvas" width="480" height="360"></canvas>
+
+    <script>
+        // This script creates a simple placeholder image for videos
+        const canvas = document.getElementById('placeholderCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Background
+        ctx.fillStyle = '#212529';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        // Play button circle
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
+        ctx.beginPath();
+        ctx.arc(canvas.width/2, canvas.height/2, 50, 0, Math.PI * 2);
+        ctx.fill();
+        
+        // Play triangle
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        ctx.moveTo(canvas.width/2 + 20, canvas.height/2);
+        ctx.lineTo(canvas.width/2 - 10, canvas.height/2 - 20);
+        ctx.lineTo(canvas.width/2 - 10, canvas.height/2 + 20);
+        ctx.closePath();
+        ctx.fill();
+        
+        // Text
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 24px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText('Video', canvas.width/2, canvas.height/2 + 80);
+        
+        // Save the canvas to a PNG
+        // For demonstration, just showing the image
+        console.log("Right-click on the canvas and select 'Save Image As...' to save as PNG");
+    </script>
+</body>
+</html>
