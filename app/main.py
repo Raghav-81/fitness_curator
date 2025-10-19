@@ -18,9 +18,10 @@ import logging
 sys.path.append(str(Path(__file__).parent.parent))
 
 # Import database models and utilities
-from app.database import DatabaseManager, WorkoutVideoModel, init_database
+from app.database import DatabaseManager, WorkoutVideoModel, init_database, Base, engine
 from app.search_engine_db import DatabaseSearchEngine
 from app.utils import extract_keywords, extract_equipment_from_title, normalize_category
+from app.workout_api import router as workout_router
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -51,10 +52,14 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Initialize database
+# Initialize database and create all tables
 init_database()
+Base.metadata.create_all(bind=engine)  # Create workout creator tables
 db_manager = DatabaseManager()
 search_engine = DatabaseSearchEngine(db_manager)
+
+# Include workout creator router
+app.include_router(workout_router)
 
 # Pydantic models for API
 class VideoCreate(BaseModel):

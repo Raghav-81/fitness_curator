@@ -16,6 +16,15 @@ engine = create_engine(DATABASE_URL, echo=False)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
+# Dependency for FastAPI
+def get_db():
+    """Get database session for dependency injection."""
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
 class WorkoutVideoModel(Base):
     """Database model for workout videos."""
     __tablename__ = "workout_videos"
