@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ plan.plan_name }} - My Workout Tracker</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/static/css/enhanced-ui.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #fff5e6 0%, #ffe4cc 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(255, 107, 53, 0.3);
+        }
+        
+        .header h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+        
+        .day-tabs {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding: 10px 0;
+            margin-bottom: 30px;
+        }
+        
+        .day-tab {
+            padding: 12px 24px;
+            background: white;
+            border: 2px solid #fed7aa;
+            border-radius: 10px;
+            cursor: pointer;
+            white-space: nowrap;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .day-tab:hover {
+            background: #fff5e6;
+            border-color: #ff6b35;
+        }
+        
+        .day-tab.active {
+            background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+            color: white;
+            border-color: #ff6b35;
+        }
+        
+        .section-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #fed7aa;
+        }
+        
+        .section-header h2 {
+            color: #ff6b35;
+            font-size: 1.5rem;
+        }
+        
+        .exercise-item {
+            background: #f9fafb;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-left: 4px solid #ff6b35;
+        }
+        
+        .exercise-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 15px;
+        }
+        
+        .exercise-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+        }
+        
+        .exercise-meta {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+        
+        .meta-badge {
+            background: #fff5e6;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            color: #666;
+        }
+        
+        .video-player {
+            margin: 15px 0;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        .log-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .log-input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .log-input-group label {
+            font-size: 0.85rem;
+            color: #666;
+            font-weight: 600;
+        }
+        
+        .log-input {
+            padding: 10px;
+            border: 2px solid #fed7aa;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+        
+        .log-input:focus {
+            outline: none;
+            border-color: #ff6b35;
+            box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.1);
+        }
+        
+        .complete-btn {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 10px;
+        }
+        
+        .complete-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(16, 185, 129, 0.3);
+        }
+        
+        .complete-btn.completed {
+            background: #d1d5db;
+            cursor: default;
+        }
+        
+        .complete-btn.completed:hover {
+            transform: none;
+        }
+        
+        .video-btn {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .video-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(59, 130, 246, 0.3);
+        }
+        
+        .youtube-link {
+            color: #ff0000;
+            text-decoration: none;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .progress-bar {
+            background: #e5e7eb;
+            height: 8px;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+        
+        .progress-fill {
+            background: linear-gradient(90deg, #10b981 0%, #059669 100%);
+            height: 100%;
+            transition: width 0.5s ease;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 900;
+            margin-bottom: 5px;
+            color: #ffffff;
+            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
+        }
+        
+        .stat-label {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #ffffff;
+            text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.2);
+        }
+        
+        .exercise-video-thumb {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            flex-shrink: 0;
+        }
+        
+        .exercise-video-thumb:hover {
+            transform: scale(1.1);
+            box-shadow: 0 5px 15px rgba(255, 107, 53, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header animate__animated animate__fadeInDown">
+            <h1><i class="fas fa-dumbbell"></i> {{ plan.plan_name }}</h1>
+            <p><i class="fas fa-user"></i> {{ plan.client_name }}</p>
+            {% if plan.description %}
+            <p style="margin-top: 10px; opacity: 0.95;">{{ plan.description }}</p>
+            {% endif %}
+        </div>
+        
+        <div class="stats-grid animate__animated animate__fadeIn">
+            <div class="stat-card">
+                <div class="stat-value" id="total-exercises">{{ plan.exercises|length }}</div>
+                <div class="stat-label">Total Exercises</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="completed-count">0</div>
+                <div class="stat-label">Completed</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="progress-percent">0%</div>
+                <div class="stat-label">Progress</div>
+            </div>
+        </div>
+        
+        <div class="progress-bar">
+            <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
+        </div>
+        
+        <!-- Day Tabs -->
+        <div class="day-tabs" id="day-tabs"></div>
+        
+        <!-- Workout Content -->
+        <div id="workout-content"></div>
+    </div>
+    
+    <script>
+        const planData = {{ plan|tojson }};
+        let completedExercises = JSON.parse(localStorage.getItem('completed_' + '{{ plan.share_token }}') || '{}');
+        let loggedData = JSON.parse(localStorage.getItem('logged_' + '{{ plan.share_token }}') || '{}');
+        
+        // Get unique days
+        const days = [...new Set(planData.exercises.map(ex => ex.day))].sort();
+        let currentDay = days[0];
+        
+        // Render day tabs
+        function renderDayTabs() {
+            const tabsContainer = document.getElementById('day-tabs');
+            tabsContainer.innerHTML = days.map(day => `
+                <div class="day-tab ${day === currentDay ? 'active' : ''}" onclick="switchDay('${day}')">
+                    <i class="fas fa-calendar-day"></i> ${day}
+                </div>
+            `).join('');
+        }
+        
+        // Switch day
+        function switchDay(day) {
+            currentDay = day;
+            renderDayTabs();
+            renderWorkout();
+        }
+        
+        // Render workout for current day
+        function renderWorkout() {
+            const dayExercises = planData.exercises.filter(ex => ex.day === currentDay);
+            const sections = {warmup: [], main: [], cooldown: []};
+            
+            dayExercises.forEach(ex => {
+                const section = ex.section || 'main';
+                sections[section].push(ex);
+            });
+            
+            const sectionIcons = {
+                warmup: 'fa-fire',
+                main: 'fa-dumbbell',
+                cooldown: 'fa-wind'
+            };
+            
+            const sectionNames = {
+                warmup: 'Warmup',
+                main: 'Main Workout',
+                cooldown: 'Cooldown'
+            };
+            
+            const content = document.getElementById('workout-content');
+            content.innerHTML = '';
+            
+            Object.entries(sections).forEach(([sectionKey, exercises]) => {
+                if (exercises.length === 0) return;
+                
+                const sectionCard = document.createElement('div');
+                sectionCard.className = 'section-card animate__animated animate__fadeInUp';
+                sectionCard.innerHTML = `
+                    <div class="section-header">
+                        <i class="fas ${sectionIcons[sectionKey]}" style="font-size: 1.5rem; color: #ff6b35;"></i>
+                        <h2>${sectionNames[sectionKey]}</h2>
+                    </div>
+                    ${exercises.map((ex, idx) => renderExercise(ex, idx)).join('')}
+                `;
+                content.appendChild(sectionCard);
+            });
+            
+            updateStats();
+        }
+        
+        // Render single exercise
+        function renderExercise(exercise, index) {
+            const exId = currentDay + '_' + index;
+            const isCompleted = completedExercises[exId] || false;
+            const logged = loggedData[exId] || {};
+            
+            // Get video ID for thumbnail
+            let videoId = null;
+            if (exercise.is_custom && exercise.custom_youtube_url) {
+                videoId = extractYouTubeId(exercise.custom_youtube_url);
+            }
+            
+            const exerciseName = exercise.is_custom ? exercise.custom_name : (exercise.video_title || 'Exercise');
+            
+            return `
+                <div class="exercise-item" id="exercise-${exId}">
+                    <div style="display: flex; gap: 15px; align-items: start; margin-bottom: 15px;">
+                        ${videoId ? `
+                            <div class="exercise-video-thumb" onclick="openVideoModal('${videoId}', '${exerciseName.replace(/'/g, "\\'")}')">
+                                <i class="fas fa-play"></i>
+                            </div>
+                        ` : `
+                            <div class="exercise-video-thumb" style="background: #6b7280;">
+                                <i class="fas fa-dumbbell"></i>
+                            </div>
+                        `}
+                        
+                        <div style="flex: 1;">
+                            <div class="exercise-title">
+                                ${exercise.is_custom ? '<span style="background: #3b82f6; color: white; padding: 3px 10px; border-radius: 6px; font-size: 0.8rem; margin-right: 8px; font-weight: 600;">CUSTOM</span>' : ''}
+                                ${exerciseName}
+                            </div>
+                            <div class="exercise-meta">
+                                ${exercise.sets ? `<span class="meta-badge"><i class="fas fa-redo"></i> Target: ${exercise.sets} sets</span>` : ''}
+                                ${exercise.reps ? `<span class="meta-badge"><i class="fas fa-hashtag"></i> ${exercise.reps} reps</span>` : ''}
+                                ${exercise.time ? `<span class="meta-badge"><i class="fas fa-clock"></i> ${exercise.time} ${exercise.time_unit || 'sec'}</span>` : ''}
+                                ${exercise.custom_equipment ? `<span class="meta-badge"><i class="fas fa-dumbbell"></i> ${exercise.custom_equipment}</span>` : ''}
+                            </div>
+                            ${exercise.notes ? `<p style="color: #666; margin-top: 8px; font-size: 0.9rem;"><i class="fas fa-sticky-note"></i> <em>${exercise.notes}</em></p>` : ''}
+                        </div>
+                    </div>
+                    
+                    <div class="log-section">
+                        <div class="log-input-group">
+                            <label><i class="fas fa-redo"></i> Sets Done</label>
+                            <input type="number" class="log-input" value="${logged.sets || ''}" 
+                                   onchange="logData('${exId}', 'sets', this.value)" placeholder="${exercise.sets || '0'}">
+                        </div>
+                        <div class="log-input-group">
+                            <label><i class="fas fa-hashtag"></i> Reps Done</label>
+                            <input type="number" class="log-input" value="${logged.reps || ''}" 
+                                   onchange="logData('${exId}', 'reps', this.value)" placeholder="${exercise.reps || '0'}">
+                        </div>
+                        ${exercise.time ? `
+                        <div class="log-input-group">
+                            <label><i class="fas fa-clock"></i> Time Done</label>
+                            <input type="number" class="log-input" value="${logged.time || ''}" 
+                                   onchange="logData('${exId}', 'time', this.value)" placeholder="${exercise.time || '0'}">
+                        </div>
+                        ` : ''}
+                        <div class="log-input-group">
+                            <label><i class="fas fa-weight-hanging"></i> Weight</label>
+                            <input type="number" class="log-input" value="${logged.weight || ''}" 
+                                   onchange="logData('${exId}', 'weight', this.value)" placeholder="0">
+                        </div>
+                        <div class="log-input-group" style="grid-column: span 2;">
+                            <label><i class="fas fa-comment"></i> My Notes</label>
+                            <input type="text" class="log-input" value="${logged.notes || ''}" 
+                                   onchange="logData('${exId}', 'notes', this.value)" placeholder="How did it feel?">
+                        </div>
+                    </div>
+                    
+                    <button class="complete-btn ${isCompleted ? 'completed' : ''}" onclick="toggleComplete('${exId}')">
+                        <i class="fas fa-${isCompleted ? 'check-circle' : 'circle'}"></i>
+                        ${isCompleted ? 'Completed!' : 'Mark as Complete'}
+                    </button>
+                </div>
+            `;
+        }
+        
+        // Open video in modal
+        function openVideoModal(videoId, title) {
+            const modal = document.createElement('div');
+            modal.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 20px;';
+            modal.onclick = function(e) { if (e.target === modal) modal.remove(); };
+            
+            modal.innerHTML = `
+                <div style="background: white; border-radius: 15px; padding: 20px; max-width: 900px; width: 100%;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                        <h3 style="margin: 0; color: #333;">${title}</h3>
+                        <button onclick="this.closest('div').parentElement.parentElement.remove()" style="background: #dc2626; color: white; border: none; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; font-size: 1.2rem;">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;">
+                        <iframe src="https://www.youtube.com/embed/${videoId}" 
+                                style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; border-radius: 10px;"
+                                frameborder="0" allowfullscreen></iframe>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+        }
+        
+        // Extract YouTube video ID
+        function extractYouTubeId(url) {
+            const regex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/;
+            const match = url.match(regex);
+            return match ? match[1] : null;
+        }
+        
+        // Log workout data
+        function logData(exId, field, value) {
+            if (!loggedData[exId]) loggedData[exId] = {};
+            loggedData[exId][field] = value;
+            localStorage.setItem('logged_' + '{{ plan.share_token }}', JSON.stringify(loggedData));
+        }
+        
+        // Toggle exercise completion
+        function toggleComplete(exId) {
+            completedExercises[exId] = !completedExercises[exId];
+            localStorage.setItem('completed_' + '{{ plan.share_token }}', JSON.stringify(completedExercises));
+            renderWorkout();
+        }
+        
+        // Update stats
+        function updateStats() {
+            const total = planData.exercises.length;
+            const completed = Object.values(completedExercises).filter(Boolean).length;
+            const percent = Math.round((completed / total) * 100);
+            
+            document.getElementById('completed-count').textContent = completed;
+            document.getElementById('progress-percent').textContent = percent + '%';
+            document.getElementById('progress-fill').style.width = percent + '%';
+        }
+        
+        // Initialize
+        renderDayTabs();
+        renderWorkout();
+    </script>
+</body>
+</html>

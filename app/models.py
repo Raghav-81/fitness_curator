@@ -48,6 +48,7 @@ class WorkoutPlan(Base):
     
     id = Column(Integer, primary_key=True, index=True)
     client_id = Column(Integer, ForeignKey("clients.id"), nullable=False, index=True)
+    title = Column(String(255), nullable=True)  # Legacy column for backward compatibility
     plan_name = Column(String(255), nullable=False)
     description = Column(Text, nullable=True)
     start_date = Column(DateTime, nullable=True)
@@ -95,12 +96,23 @@ class PlanExercise(Base):
     
     id = Column(Integer, primary_key=True, index=True)
     plan_id = Column(Integer, ForeignKey("workout_plans.id"), nullable=False, index=True)
-    video_id = Column(Integer, ForeignKey("workout_videos.id"), nullable=False, index=True)
+    video_id = Column(Integer, ForeignKey("workout_videos.id"), nullable=True, index=True)  # Nullable for custom exercises
+    
+    # Exercise details
+    section = Column(String(20), nullable=True)  # "warmup", "main", or "cooldown"
     day = Column(String(50), nullable=False)  # Can be "Monday", "Day 1", etc.
     sets = Column(Integer, nullable=True)
     reps = Column(String(50), nullable=True)  # String to allow "10-12" or "AMRAP"
+    time = Column(Integer, nullable=True)  # Hold time in seconds/minutes
+    time_unit = Column(String(10), nullable=True)  # "sec" or "min"
     notes = Column(Text, nullable=True)
     order_index = Column(Integer, default=0)  # For ordering exercises within a day
+    
+    # Custom exercise fields
+    is_custom = Column(Boolean, default=False)
+    custom_name = Column(String(255), nullable=True)
+    custom_youtube_url = Column(String(500), nullable=True)
+    custom_equipment = Column(String(255), nullable=True)
     
     # Client tracking fields (for when client uses the plan)
     completed = Column(Boolean, default=False)
@@ -118,11 +130,18 @@ class PlanExercise(Base):
             "plan_id": self.plan_id,
             "video_id": self.video_id,
             "video": self.video.to_dict() if self.video else None,
+            "section": self.section,
             "day": self.day,
             "sets": self.sets,
             "reps": self.reps,
+            "time": self.time,
+            "time_unit": self.time_unit,
             "notes": self.notes,
             "order_index": self.order_index,
+            "is_custom": self.is_custom,
+            "custom_name": self.custom_name,
+            "custom_youtube_url": self.custom_youtube_url,
+            "custom_equipment": self.custom_equipment,
             "completed": self.completed,
             "weight_logged": self.weight_logged,
             "created_at": self.created_at.isoformat() if self.created_at else None

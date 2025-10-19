@@ -147,6 +147,10 @@ async def create_workout_plan(plan: WorkoutPlanCreate, db: Session = Depends(get
         day_type=plan.day_type
     )
     
+    # Also set title for backward compatibility with old schema
+    if hasattr(new_plan, 'title'):
+        new_plan.title = plan.plan_name
+    
     # Generate share token
     new_plan.generate_share_token()
     

@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ plan.plan_name }} - My Workout Plan</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #fff5e6 0%, #ffe4cc 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(255, 107, 53, 0.2);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.95;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        
+        .info-card {
+            background: #fff5e6;
+            padding: 20px;
+            border-radius: 12px;
+            border-left: 4px solid #ff6b35;
+        }
+        
+        .info-card h3 {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .info-card p {
+            color: #333;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+        
+        .section {
+            margin-bottom: 40px;
+        }
+        
+        .section-title {
+            font-size: 1.8rem;
+            color: #ff6b35;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .exercise-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        
+        .exercise-table th {
+            background: #ff6b35;
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+        
+        .exercise-table td {
+            padding: 15px;
+            border-bottom: 1px solid #fed7aa;
+        }
+        
+        .exercise-table tr:hover {
+            background: #fff5e6;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        
+        .badge-warmup {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        
+        .badge-main {
+            background: #fed7aa;
+            color: #9a3412;
+        }
+        
+        .badge-cooldown {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+        
+        .badge-custom {
+            background: #e0e7ff;
+            color: #3730a3;
+        }
+        
+        @media print {
+            body {
+                background: white;
+            }
+            
+            .container {
+                box-shadow: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-dumbbell"></i> {{ plan.plan_name }}</h1>
+            {% if plan.client_name %}
+            <p>For: {{ plan.client_name }}</p>
+            {% endif %}
+        </div>
+        
+        <div class="content">
+            {% if plan.description %}
+            <div style="background: #f0f9ff; padding: 20px; border-radius: 12px; margin-bottom: 30px; border-left: 4px solid #3b82f6;">
+                <h3 style="color: #1e40af; margin-bottom: 10px;"><i class="fas fa-info-circle"></i> Description</h3>
+                <p style="color: #1e3a8a; line-height: 1.6;">{{ plan.description }}</p>
+            </div>
+            {% endif %}
+            
+            <div class="info-grid">
+                {% if plan.start_date %}
+                <div class="info-card">
+                    <h3><i class="fas fa-calendar-start"></i> Start Date</h3>
+                    <p>{{ plan.start_date[:10] }}</p>
+                </div>
+                {% endif %}
+                
+                {% if plan.end_date %}
+                <div class="info-card">
+                    <h3><i class="fas fa-calendar-end"></i> End Date</h3>
+                    <p>{{ plan.end_date[:10] }}</p>
+                </div>
+                {% endif %}
+                
+                <div class="info-card">
+                    <h3><i class="fas fa-dumbbell"></i> Total Exercises</h3>
+                    <p>{{ plan.exercises|length }}</p>
+                </div>
+                
+                <div class="info-card">
+                    <h3><i class="fas fa-calendar-day"></i> Day Format</h3>
+                    <p>{{ 'Day Numbers' if plan.day_type == 'day_number' else 'Days of Week' }}</p>
+                </div>
+            </div>
+            
+            {% set sections = {'warmup': 'Warmup', 'main': 'Main Workout', 'cooldown': 'Cooldown'} %}
+            {% for section_key, section_name in sections.items() %}
+                {% set section_exercises = plan.exercises|selectattr('section', 'equalto', section_key)|list %}
+                {% if section_exercises %}
+                <div class="section">
+                    <h2 class="section-title">
+                        {% if section_key == 'warmup' %}
+                            <i class="fas fa-fire"></i>
+                        {% elif section_key == 'main' %}
+                            <i class="fas fa-dumbbell"></i>
+                        {% else %}
+                            <i class="fas fa-wind"></i>
+                        {% endif %}
+                        {{ section_name }}
+                    </h2>
+                    
+                    <table class="exercise-table">
+                        <thead>
+                            <tr>
+                                <th>Day</th>
+                                <th>Exercise</th>
+                                <th>Sets</th>
+                                <th>Reps</th>
+                                <th>Time</th>
+                                <th>Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for exercise in section_exercises %}
+                            <tr>
+                                <td><strong>{{ exercise.day }}</strong></td>
+                                <td>
+                                    {% if exercise.is_custom %}
+                                        <span class="badge badge-custom">CUSTOM</span>
+                                        {{ exercise.custom_name }}
+                                    {% else %}
+                                        {{ exercise.video_title or 'Exercise' }}
+                                    {% endif %}
+                                </td>
+                                <td>{{ exercise.sets or '-' }}</td>
+                                <td>{{ exercise.reps or '-' }}</td>
+                                <td>
+                                    {% if exercise.time %}
+                                        {{ exercise.time }} {{ exercise.time_unit or 'sec' }}
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+                                <td>{{ exercise.notes or '-' }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% endif %}
+            {% endfor %}
+            
+            <div style="text-align: center; margin-top: 40px; padding-top: 30px; border-top: 2px solid #fed7aa;">
+                <p style="color: #666; margin-bottom: 15px;">
+                    <i class="fas fa-heart" style="color: #ff6b35;"></i> 
+                    Created with Fitness Curator
+                </p>
+                <button onclick="window.print()" style="background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%); color: white; border: none; padding: 12px 30px; border-radius: 8px; font-size: 1rem; cursor: pointer; font-weight: 600;">
+                    <i class="fas fa-print"></i> Print Workout Plan
+                </button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

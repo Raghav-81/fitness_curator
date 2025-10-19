@@ -96,6 +96,29 @@ async def root(request: Request):
     """Root endpoint - serves the main page."""
     return templates.TemplateResponse("index.html", {"request": request})
 
+@app.get("/workout-plan/{share_token}")
+async def view_shared_workout_plan(share_token: str, request: Request):
+    """View a shared workout plan via share token."""
+    from sqlalchemy.orm import Session
+    from app.database import SessionLocal
+    from app.models import WorkoutPlan
+    
+    db = SessionLocal()
+    try:
+        # Find the workout plan by share token
+        plan = db.query(WorkoutPlan).filter(WorkoutPlan.share_token == share_token).first()
+        
+        if not plan:
+            raise HTTPException(status_code=404, detail="Workout plan not found")
+        
+        # Return the interactive client workout tracker
+        return templates.TemplateResponse("client_workout_tracker.html", {
+            "request": request,
+            "plan": plan.to_dict(include_exercises=True)
+        })
+    finally:
+        db.close()
+
 @app.get("/api")
 async def api_info():
     """API information endpoint."""

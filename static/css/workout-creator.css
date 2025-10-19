@@ -42,45 +42,48 @@
     border-left: 2px solid var(--border-light);
     display: flex;
     flex-direction: column;
-    transition: width 0.3s ease;
+    transition: all 0.3s ease;
 }
 
 .creator-video-panel.collapsed {
     width: 0;
+    min-width: 0;
     overflow: hidden;
+    border-left: none;
 }
 
 /* Panel Toggle Button */
 .panel-toggle-btn {
-    position: absolute;
-    right: 450px;
+    position: fixed;
+    right: 460px;
     top: 50%;
     transform: translateY(-50%);
+    z-index: 1001;
     background: linear-gradient(135deg, var(--saffron-primary) 0%, var(--saffron-secondary) 100%);
     color: white;
     border: none;
-    width: 40px;
+    width: 36px;
     height: 80px;
     border-radius: 8px 0 0 8px;
     cursor: pointer;
-    z-index: 10;
-    transition: all 0.3s ease;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 18px;
-    box-shadow: -2px 0 8px rgba(255, 107, 53, 0.3);
+    font-size: 1.1rem;
+    box-shadow: -3px 0 15px rgba(255, 107, 53, 0.4);
 }
 
 .panel-toggle-btn:hover {
     background: linear-gradient(135deg, var(--saffron-secondary) 0%, var(--saffron-light) 100%);
-    width: 45px;
-    box-shadow: -4px 0 12px rgba(255, 107, 53, 0.5);
+    width: 42px;
+    box-shadow: -5px 0 20px rgba(255, 107, 53, 0.6);
+    transform: translateY(-50%) translateX(-5px);
 }
 
 .creator-video-panel.collapsed + .panel-toggle-btn {
-    right: 0;
-    border-radius: 0 8px 8px 0;
+    right: 10px;
+    border-radius: 8px 0 0 8px;
 }
 
 /* Form Sections */
@@ -152,11 +155,70 @@
     min-height: 80px;
 }
 
+/* Exercise Sections (Warmup, Main, Cooldown) */
+.exercise-section-container {
+    margin-bottom: 20px;
+    border: 2px solid var(--border-light);
+    border-radius: 12px;
+    overflow: hidden;
+    background: white;
+}
+
+.exercise-section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    background: linear-gradient(135deg, var(--saffron-lighter) 0%, var(--white) 100%);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.exercise-section-header:hover {
+    background: linear-gradient(135deg, var(--saffron-pale) 0%, var(--saffron-lighter) 100%);
+}
+
+.exercise-section-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.exercise-section-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-dark);
+}
+
+.exercise-count {
+    font-size: 0.9rem;
+    color: var(--text-medium);
+}
+
+.toggle-icon {
+    transition: transform 0.3s ease;
+    color: var(--saffron-primary);
+}
+
+.toggle-icon.rotated {
+    transform: rotate(180deg);
+}
+
+.exercise-section-content {
+    padding: 20px;
+    display: block;
+}
+
+.exercise-section-content.collapsed {
+    display: none;
+}
+
 /* Exercise Table */
 .exercises-table-container {
     background: white;
-    border-radius: 12px;
+    border-radius: 10px;
     padding: 20px;
+    border: 2px solid #e0e0e0;
     box-shadow: 0 2px 8px rgba(0,0,0,0.05);
     margin-top: 20px;
 }
