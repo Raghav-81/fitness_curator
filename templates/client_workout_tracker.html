@@ -4,8 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ plan.plan_name }} - My Workout Tracker</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="512x512" href="/static/logo-512.png">
+    <link rel="icon" type="image/png" sizes="256x256" href="/static/favicon-256.png">
+    <link rel="icon" type="image/png" sizes="128x128" href="/static/favicon-128.png">
+    <link rel="icon" type="image/png" sizes="64x64" href="/static/favicon-64.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/static/favicon-32.png">
+    <link rel="apple-touch-icon" href="/static/logo-512.png">
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="/static/css/enhanced-ui.css">
+    <link rel="stylesheet" href="/static/css/enhanced-ui.css?v=2.0">
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -28,39 +38,82 @@
             box-shadow: 0 10px 30px rgba(255, 107, 53, 0.3);
         }
         
+        .header-logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .header-logo img {
+            width: 50px;
+            height: 50px;
+            object-fit: contain;
+        }
+        
         .header h1 {
-            font-size: 2rem;
             margin-bottom: 10px;
         }
         
         .day-tabs {
             display: flex;
-            gap: 10px;
+            gap: 8px;
             overflow-x: auto;
-            padding: 10px 0;
-            margin-bottom: 30px;
+            padding: 15px 0;
+            margin-bottom: 25px;
+            background: white;
+            border-radius: 15px;
+            padding: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
         }
         
         .day-tab {
-            padding: 12px 24px;
-            background: white;
-            border: 2px solid #fed7aa;
+            padding: 14px 28px;
+            background: #f9fafb;
             border-radius: 10px;
             cursor: pointer;
+            transition: all 0.3s ease;
             white-space: nowrap;
             font-weight: 600;
-            transition: all 0.3s;
+            border: 2px solid #e5e7eb;
+            color: #6b7280;
+            position: relative;
+            min-width: 120px;
+            text-align: center;
         }
         
         .day-tab:hover {
             background: #fff5e6;
-            border-color: #ff6b35;
+            border-color: #fed7aa;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(255, 107, 53, 0.1);
         }
         
         .day-tab.active {
             background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
             color: white;
             border-color: #ff6b35;
+            box-shadow: 0 4px 15px rgba(255, 107, 53, 0.4);
+            transform: translateY(-2px);
+        }
+        
+        .day-tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -17px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 8px solid transparent;
+            border-right: 8px solid transparent;
+            border-top: 8px solid #ff6b35;
+        }
+        
+        .day-tab-progress {
+            font-size: 0.7rem;
+            margin-top: 4px;
+            opacity: 0.8;
         }
         
         .section-card {
@@ -246,14 +299,14 @@
             font-weight: 900;
             margin-bottom: 5px;
             color: #ffffff;
-            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
         }
         
         .stat-label {
             font-size: 0.95rem;
             font-weight: 600;
             color: #ffffff;
-            text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.2);
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
         }
         
         .exercise-video-thumb {
@@ -280,8 +333,13 @@
 <body>
     <div class="container">
         <div class="header animate__animated animate__fadeInDown">
-            <h1><i class="fas fa-dumbbell"></i> {{ plan.plan_name }}</h1>
-            <p><i class="fas fa-user"></i> {{ plan.client_name }}</p>
+            <div class="header-logo">
+                <img src="/static/logo.png" alt="Fitness Curator">
+                <div>
+                    <h1 style="margin: 0;">{{ plan.plan_name }}</h1>
+                    <p style="margin: 5px 0 0 0;"><i class="fas fa-user"></i> {{ plan.client_name }}</p>
+                </div>
+            </div>
             {% if plan.description %}
             <p style="margin-top: 10px; opacity: 0.95;">{{ plan.description }}</p>
             {% endif %}
@@ -306,8 +364,17 @@
             <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
         </div>
         
-        <!-- Day Tabs -->
-        <div class="day-tabs" id="day-tabs"></div>
+        <!-- Day Selector -->
+        <div style="background: white; padding: 20px; border-radius: 15px; margin-bottom: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <h3 style="margin: 0; color: #ff6b35;"><i class="fas fa-calendar-week"></i> Select Workout Day</h3>
+                <select id="day-selector" onchange="switchDayFromDropdown(this.value)" style="padding: 10px 20px; border: 2px solid #fed7aa; border-radius: 8px; font-size: 1rem; font-weight: 600; background: white; cursor: pointer; color: #ff6b35;">
+                    <!-- Options populated by JavaScript -->
+                </select>
+            </div>
+            <!-- Day Tabs -->
+            <div class="day-tabs" id="day-tabs"></div>
+        </div>
         
         <!-- Workout Content -->
         <div id="workout-content"></div>
@@ -318,34 +385,102 @@
         let completedExercises = JSON.parse(localStorage.getItem('completed_' + '{{ plan.share_token }}') || '{}');
         let loggedData = JSON.parse(localStorage.getItem('logged_' + '{{ plan.share_token }}') || '{}');
         
-        // Get unique days
-        const days = [...new Set(planData.exercises.map(ex => ex.day))].sort();
+        // Get unique days and format them
+        const uniqueDays = [...new Set(planData.exercises.map(ex => ex.day))].sort((a, b) => {
+            // Sort numerically if possible
+            const numA = parseInt(a);
+            const numB = parseInt(b);
+            if (!isNaN(numA) && !isNaN(numB)) return numA - numB;
+            return a.localeCompare(b);
+        });
+        
+        // Format day labels
+        const days = uniqueDays.map(day => {
+            // If it's just a number, format as "Day X"
+            if (!isNaN(parseInt(day)) && day == parseInt(day)) {
+                return `Day ${day}`;
+            }
+            return day;
+        });
+        
+        // Map original day values to formatted labels
+        const dayMapping = {};
+        uniqueDays.forEach((originalDay, idx) => {
+            dayMapping[days[idx]] = originalDay;
+        });
+        
         let currentDay = days[0];
         
-        // Render day tabs
-        function renderDayTabs() {
-            const tabsContainer = document.getElementById('day-tabs');
-            tabsContainer.innerHTML = days.map(day => `
-                <div class="day-tab ${day === currentDay ? 'active' : ''}" onclick="switchDay('${day}')">
-                    <i class="fas fa-calendar-day"></i> ${day}
-                </div>
-            `).join('');
+        // Populate day dropdown
+        function populateDayDropdown() {
+            const dropdown = document.getElementById('day-selector');
+            dropdown.innerHTML = days.map(day => {
+                const originalDay = dayMapping[day] || day;
+                const dayExercises = planData.exercises.filter(ex => ex.day == originalDay);
+                const completedCount = dayExercises.filter((ex, idx) => {
+                    const exId = day + '_' + idx;
+                    return completedExercises[exId];
+                }).length;
+                const progressPercent = dayExercises.length > 0 ? Math.round((completedCount / dayExercises.length) * 100) : 0;
+                
+                return `<option value="${day}" ${day === currentDay ? 'selected' : ''}>${day} - ${completedCount}/${dayExercises.length} (${progressPercent}%)</option>`;
+            }).join('');
         }
         
-        // Switch day
+        // Render day tabs with progress tracking
+        function renderDayTabs() {
+            const tabsContainer = document.getElementById('day-tabs');
+            tabsContainer.innerHTML = days.map(day => {
+                // Calculate progress for this day
+                const originalDay = dayMapping[day] || day;
+                const dayExercises = planData.exercises.filter(ex => ex.day == originalDay);
+                const completedCount = dayExercises.filter((ex, idx) => {
+                    const exId = day + '_' + idx;
+                    return completedExercises[exId];
+                }).length;
+                const progressPercent = dayExercises.length > 0 ? Math.round((completedCount / dayExercises.length) * 100) : 0;
+                
+                return `
+                    <div class="day-tab ${day === currentDay ? 'active' : ''}" onclick="switchDay('${day}')">
+                        <div><i class="fas fa-calendar-day"></i> ${day}</div>
+                        <div class="day-tab-progress">${completedCount}/${dayExercises.length} (${progressPercent}%)</div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        // Switch day from dropdown
+        function switchDayFromDropdown(day) {
+            currentDay = day;
+            populateDayDropdown();
+            renderDayTabs();
+            renderWorkout();
+            // Scroll to workout content
+            document.getElementById('workout-content').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+        
+        // Switch day from tabs
         function switchDay(day) {
             currentDay = day;
+            populateDayDropdown();
             renderDayTabs();
             renderWorkout();
         }
         
         // Render workout for current day
         function renderWorkout() {
-            const dayExercises = planData.exercises.filter(ex => ex.day === currentDay);
+            // Get the original day value from mapping
+            const originalDay = dayMapping[currentDay] || currentDay;
+            const dayExercises = planData.exercises.filter(ex => ex.day == originalDay);
+            
             const sections = {warmup: [], main: [], cooldown: []};
             
             dayExercises.forEach(ex => {
-                const section = ex.section || 'main';
+                // Handle NULL section - default to 'main'
+                let section = ex.section;
+                if (!section || section === null || section === 'null' || section === '') {
+                    section = 'main';
+                }
                 sections[section].push(ex);
             });
             
@@ -386,22 +521,70 @@
         function renderExercise(exercise, index) {
             const exId = currentDay + '_' + index;
             const isCompleted = completedExercises[exId] || false;
-            const logged = loggedData[exId] || {};
+            const logged = loggedData[exId] || { sets: [] };
             
-            // Get video ID for thumbnail
+            // Get video ID and name - COMPREHENSIVE FIX
             let videoId = null;
-            if (exercise.is_custom && exercise.custom_youtube_url) {
-                videoId = extractYouTubeId(exercise.custom_youtube_url);
+            let exerciseName = 'Exercise';
+            let videoUrl = null;
+            
+            if (exercise.is_custom) {
+                exerciseName = exercise.custom_name || 'Custom Exercise';
+                videoUrl = exercise.custom_youtube_url;
+            } else if (exercise.video) {
+                exerciseName = exercise.video.title || 'Exercise';
+                videoUrl = exercise.video.video_url || exercise.video.youtube_url || exercise.video.url;
             }
             
-            const exerciseName = exercise.is_custom ? exercise.custom_name : (exercise.video_title || 'Exercise');
+            // Extract video ID from URL (YouTube only)
+            if (videoUrl && !videoUrl.includes('drive.google.com')) {
+                videoId = extractYouTubeId(videoUrl);
+            }
+            
+            // Initialize sets array based on trainer's plan
+            const targetSets = exercise.sets || 3;
+            const targetReps = exercise.reps || '';
+            const targetTime = exercise.time || '';
+            
+            // Auto-populate sets with target values from plan
+            if (!logged.sets || logged.sets.length === 0) {
+                logged.sets = Array(targetSets).fill(null).map(() => ({
+                    reps: '',  // Leave empty for client to fill
+                    weight: '',
+                    time: '',
+                    unit: 'kg'
+                }));
+                // Save initialized structure
+                loggedData[exId] = logged;
+                localStorage.setItem('logged_' + '{{ plan.share_token }}', JSON.stringify(loggedData));
+            } else if (logged.sets.length !== targetSets) {
+                // Adjust if trainer changed number of sets
+                const currentSets = logged.sets;
+                if (currentSets.length < targetSets) {
+                    // Add more sets
+                    for (let i = currentSets.length; i < targetSets; i++) {
+                        logged.sets.push({ reps: '', weight: '', time: '', unit: 'kg' });
+                    }
+                } else {
+                    // Remove extra sets
+                    logged.sets = logged.sets.slice(0, targetSets);
+                }
+            }
             
             return `
                 <div class="exercise-item" id="exercise-${exId}">
                     <div style="display: flex; gap: 15px; align-items: start; margin-bottom: 15px;">
                         ${videoId ? `
-                            <div class="exercise-video-thumb" onclick="openVideoModal('${videoId}', '${exerciseName.replace(/'/g, "\\'")}')">
+                            <div class="exercise-video-thumb" onclick="openVideoModal('${videoId}', '${exerciseName.replace(/'/g, "\\'")}', null)">
                                 <i class="fas fa-play"></i>
+                            </div>
+                        ` : videoUrl && (videoUrl.includes('youtube.com') || videoUrl.includes('youtu.be')) ? `
+                            <div class="exercise-video-thumb" onclick='openVideoModal(null, "${exerciseName.replace(/"/g, '&quot;')}", "${videoUrl}")'>
+                                <i class="fas fa-play"></i>
+                            </div>
+                        ` : videoUrl && videoUrl.includes('drive.google.com') ? `
+                            <div class="exercise-video-thumb" onclick='openVideoModal(null, "${exerciseName.replace(/"/g, '&quot;')}", "${videoUrl}")' style="background: #4285f4; cursor: pointer;" title="Click to view">
+                                <i class="fab fa-google-drive" style="color: white;"></i>
                             </div>
                         ` : `
                             <div class="exercise-video-thumb" style="background: #6b7280;">
@@ -425,32 +608,54 @@
                     </div>
                     
                     <div class="log-section">
-                        <div class="log-input-group">
-                            <label><i class="fas fa-redo"></i> Sets Done</label>
-                            <input type="number" class="log-input" value="${logged.sets || ''}" 
-                                   onchange="logData('${exId}', 'sets', this.value)" placeholder="${exercise.sets || '0'}">
+                        <h4 style="margin-bottom: 15px; color: #ff6b35; font-size: 1rem;">
+                            <i class="fas fa-clipboard-list"></i> Log Your Sets
+                        </h4>
+                        <div style="display: flex; flex-direction: column; gap: 10px;">
+                            ${logged.sets.map((set, setIdx) => `
+                                <div style="display: grid; grid-template-columns: 60px 1fr 1fr 1fr 80px; gap: 10px; align-items: center; background: white; padding: 12px; border-radius: 8px; border: 2px solid #fed7aa;">
+                                    <div style="font-weight: 700; color: #ff6b35; text-align: center;">Set ${setIdx + 1}</div>
+                                    <div>
+                                        <label style="font-size: 0.75rem; color: #666; display: block; margin-bottom: 4px;">Reps</label>
+                                        <input type="number" class="log-input" style="width: 100%; padding: 8px;" 
+                                               value="${set.reps || ''}" 
+                                               onchange="logSetData('${exId}', ${setIdx}, 'reps', this.value)" 
+                                               placeholder="${exercise.reps || '10'}">
+                                    </div>
+                                    <div>
+                                        <label style="font-size: 0.75rem; color: #666; display: block; margin-bottom: 4px;">Weight</label>
+                                        <input type="number" class="log-input" style="width: 100%; padding: 8px;" 
+                                               value="${set.weight || ''}" 
+                                               onchange="logSetData('${exId}', ${setIdx}, 'weight', this.value)" 
+                                               placeholder="0" step="0.5">
+                                    </div>
+                                    ${exercise.time ? `
+                                    <div>
+                                        <label style="font-size: 0.75rem; color: #666; display: block; margin-bottom: 4px;">Time (${exercise.time_unit || 'sec'})</label>
+                                        <input type="number" class="log-input" style="width: 100%; padding: 8px;" 
+                                               value="${set.time || ''}" 
+                                               onchange="logSetData('${exId}', ${setIdx}, 'time', this.value)" 
+                                               placeholder="${exercise.time || '30'}">
+                                    </div>
+                                    ` : '<div></div>'}
+                                    <div>
+                                        <label style="font-size: 0.75rem; color: #666; display: block; margin-bottom: 4px;">Unit</label>
+                                        <select class="log-input" style="width: 100%; padding: 8px;" 
+                                                onchange="logSetData('${exId}', ${setIdx}, 'unit', this.value)">
+                                            <option value="kg" ${set.unit === 'kg' ? 'selected' : ''}>kg</option>
+                                            <option value="lb" ${set.unit === 'lb' ? 'selected' : ''}>lb</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            `).join('')}
                         </div>
-                        <div class="log-input-group">
-                            <label><i class="fas fa-hashtag"></i> Reps Done</label>
-                            <input type="number" class="log-input" value="${logged.reps || ''}" 
-                                   onchange="logData('${exId}', 'reps', this.value)" placeholder="${exercise.reps || '0'}">
-                        </div>
-                        ${exercise.time ? `
-                        <div class="log-input-group">
-                            <label><i class="fas fa-clock"></i> Time Done</label>
-                            <input type="number" class="log-input" value="${logged.time || ''}" 
-                                   onchange="logData('${exId}', 'time', this.value)" placeholder="${exercise.time || '0'}">
-                        </div>
-                        ` : ''}
-                        <div class="log-input-group">
-                            <label><i class="fas fa-weight-hanging"></i> Weight</label>
-                            <input type="number" class="log-input" value="${logged.weight || ''}" 
-                                   onchange="logData('${exId}', 'weight', this.value)" placeholder="0">
-                        </div>
-                        <div class="log-input-group" style="grid-column: span 2;">
-                            <label><i class="fas fa-comment"></i> My Notes</label>
-                            <input type="text" class="log-input" value="${logged.notes || ''}" 
-                                   onchange="logData('${exId}', 'notes', this.value)" placeholder="How did it feel?">
+                        <div style="margin-top: 15px;">
+                            <label style="font-size: 0.85rem; color: #666; display: block; margin-bottom: 8px;">
+                                <i class="fas fa-comment"></i> Workout Notes
+                            </label>
+                            <textarea class="log-input" style="width: 100%; padding: 10px; min-height: 60px; resize: vertical;" 
+                                      onchange="logGeneralData('${exId}', 'notes', this.value)" 
+                                      placeholder="How did this exercise feel? Any observations?">${logged.notes || ''}</textarea>
                         </div>
                     </div>
                     
@@ -462,29 +667,95 @@
             `;
         }
         
-        // Open video in modal
-        function openVideoModal(videoId, title) {
-            const modal = document.createElement('div');
-            modal.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 20px;';
-            modal.onclick = function(e) { if (e.target === modal) modal.remove(); };
+        // Open video in modal (YouTube, Google Drive, or custom URL)
+        function openVideoModal(videoId, title, customUrl = null) {
+            try {
+                const modal = document.createElement('div');
+                modal.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 20px;';
+                modal.onclick = function(e) { if (e.target === modal) modal.remove(); };
             
-            modal.innerHTML = `
-                <div style="background: white; border-radius: 15px; padding: 20px; max-width: 900px; width: 100%;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                        <h3 style="margin: 0; color: #333;">${title}</h3>
-                        <button onclick="this.closest('div').parentElement.parentElement.remove()" style="background: #dc2626; color: white; border: none; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; font-size: 1.2rem;">
-                            <i class="fas fa-times"></i>
-                        </button>
-                    </div>
-                    <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;">
-                        <iframe src="https://www.youtube.com/embed/${videoId}" 
-                                style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; border-radius: 10px;"
-                                frameborder="0" allowfullscreen></iframe>
-                    </div>
-                </div>
-            `;
+            let videoContent = '';
+            let url = customUrl;
             
-            document.body.appendChild(modal);
+            // If videoId is provided, construct YouTube URL
+            if (videoId && !customUrl) {
+                url = `https://www.youtube.com/watch?v=${videoId}`;
+            }
+            
+            // Check URL type
+            if (url) {
+                if (url.includes('youtube.com') || url.includes('youtu.be')) {
+                    // YouTube video - embed
+                    const ytVideoId = extractYouTubeId(url);
+                    if (ytVideoId) {
+                        videoContent = `
+                            <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;">
+                                <iframe src="https://www.youtube.com/embed/${ytVideoId}" 
+                                        style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; border-radius: 10px;"
+                                        frameborder="0" allowfullscreen></iframe>
+                            </div>
+                        `;
+                    }
+                } else if (url.includes('drive.google.com')) {
+                    // Google Drive - embed video player
+                    const fileIdMatch = url.match(/id=([^&]+)/);
+                    if (fileIdMatch) {
+                        const fileId = fileIdMatch[1];
+                        // Use Google Drive embed URL to play video in modal
+                        videoContent = `
+                            <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;">
+                                <iframe 
+                                    src="https://drive.google.com/file/d/${fileId}/preview" 
+                                    style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; border-radius: 10px;"
+                                    allow="autoplay; fullscreen"
+                                    allowfullscreen>
+                                </iframe>
+                            </div>
+                        `;
+                    } else {
+                        // Fallback if file ID can't be extracted
+                        videoContent = `
+                            <div style="padding: 60px 40px; text-align: center; background: linear-gradient(135deg, #4285f4 0%, #34a853 100%); border-radius: 10px; color: white;">
+                                <i class="fab fa-google-drive" style="font-size: 5rem; margin-bottom: 20px; opacity: 0.9;"></i>
+                                <h3 style="margin-bottom: 15px; font-size: 1.5rem;">Google Drive Video</h3>
+                                <p style="margin-bottom: 25px; opacity: 0.9;">Click below to open the video in Google Drive</p>
+                                <a href="${url}" target="_blank" style="display: inline-block; background: white; color: #4285f4; padding: 15px 40px; border-radius: 8px; text-decoration: none; font-weight: 700; font-size: 1.1rem;">
+                                    <i class="fas fa-external-link-alt"></i> Open in Google Drive
+                                </a>
+                            </div>
+                        `;
+                    }
+                } else {
+                    // Other URL - show link
+                    videoContent = `
+                        <div style="padding: 40px; text-align: center; background: #f3f4f6; border-radius: 10px;">
+                            <i class="fas fa-video" style="font-size: 3rem; color: #9ca3af; margin-bottom: 15px;"></i>
+                            <p style="color: #6b7280; margin-bottom: 15px;">External Video Link</p>
+                            <a href="${url}" target="_blank" style="color: #ff6b35; text-decoration: none; font-weight: 600; font-size: 1.1rem;">
+                                <i class="fas fa-external-link-alt"></i> Open Video
+                            </a>
+                        </div>
+                    `;
+                }
+            }
+            
+                modal.innerHTML = `
+                    <div style="background: white; border-radius: 15px; padding: 20px; max-width: 900px; width: 100%;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                            <h3 style="margin: 0; color: #333;">${title}</h3>
+                            <button onclick="this.closest('div').parentElement.parentElement.remove()" style="background: #dc2626; color: white; border: none; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; font-size: 1.2rem;">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        ${videoContent}
+                    </div>
+                `;
+                
+                document.body.appendChild(modal);
+            } catch (error) {
+                console.error('Error opening video modal:', error);
+                alert('Failed to open video. Please try again.');
+            }
         }
         
         // Extract YouTube video ID
@@ -494,34 +765,63 @@
             return match ? match[1] : null;
         }
         
-        // Log workout data
-        function logData(exId, field, value) {
+        // Save set data
+        function saveSetData(exId, setIndex, field, value) {
+            try {
+                if (!loggedData[exId]) {
+                    loggedData[exId] = { sets: [] };
+                }
+                if (!loggedData[exId].sets[setIndex]) {
+                    loggedData[exId].sets[setIndex] = { reps: '', weight: '', time: '', unit: 'kg' };
+                }
+                loggedData[exId].sets[setIndex][field] = value;
+                localStorage.setItem('logged_' + '{{ plan.share_token }}', JSON.stringify(loggedData));
+            } catch (error) {
+                console.error('Error saving set data:', error);
+            }
+        }
+        
+        // Log general exercise data (notes)
+        function logGeneralData(exId, field, value) {
             if (!loggedData[exId]) loggedData[exId] = {};
             loggedData[exId][field] = value;
             localStorage.setItem('logged_' + '{{ plan.share_token }}', JSON.stringify(loggedData));
+            renderWorkout();
+            renderDayTabs();
+            populateDayDropdown();
+            updateStats();
         }
         
         // Toggle exercise completion
         function toggleComplete(exId) {
-            completedExercises[exId] = !completedExercises[exId];
-            localStorage.setItem('completed_' + '{{ plan.share_token }}', JSON.stringify(completedExercises));
+            try {
+                completedExercises[exId] = !completedExercises[exId];
+                localStorage.setItem('completed_' + '{{ plan.share_token }}', JSON.stringify(completedExercises));
+                renderWorkout();
+                renderDayTabs();
+                populateDayDropdown();
+                updateStats();
+            } catch (error) {
+                console.error('Error toggling completion:', error);
+                alert('Failed to save completion status. Please try again.');
+            }
+        }
+        
+        // Initialize with error handling
+        try {
+            populateDayDropdown();
+            renderDayTabs();
             renderWorkout();
+        } catch (error) {
+            console.error('Error initializing workout tracker:', error);
+            document.getElementById('workout-content').innerHTML = `
+                <div style="padding: 40px; text-align: center; background: #fee2e2; border-radius: 10px; color: #991b1b;">
+                    <i class="fas fa-exclamation-triangle" style="font-size: 3rem; margin-bottom: 15px;"></i>
+                    <h3>Error Loading Workout</h3>
+                    <p>Please refresh the page or contact support if the issue persists.</p>
+                </div>
+            `;
         }
-        
-        // Update stats
-        function updateStats() {
-            const total = planData.exercises.length;
-            const completed = Object.values(completedExercises).filter(Boolean).length;
-            const percent = Math.round((completed / total) * 100);
-            
-            document.getElementById('completed-count').textContent = completed;
-            document.getElementById('progress-percent').textContent = percent + '%';
-            document.getElementById('progress-fill').style.width = percent + '%';
-        }
-        
-        // Initialize
-        renderDayTabs();
-        renderWorkout();
     </script>
 </body>
 </html>

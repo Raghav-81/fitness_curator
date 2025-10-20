@@ -210,18 +210,38 @@ async def get_plan_by_share_token(share_token: str, db: Session = Depends(get_db
 @router.put("/workout-plans/{plan_id}")
 async def update_workout_plan(
     plan_id: int,
-    plan_update: WorkoutPlanUpdate,
+    plan_update: WorkoutPlanCreate,  # Use full plan data including exercises
     db: Session = Depends(get_db)
 ):
-    """Update a workout plan."""
+    """Update a workout plan with exercises."""
     plan = db.query(WorkoutPlan).filter(WorkoutPlan.id == plan_id).first()
     if not plan:
         raise HTTPException(status_code=404, detail="Workout plan not found")
     
-    for key, value in plan_update.dict(exclude_unset=True).items():
-        setattr(plan, key, value)
-    
+    # Update plan fields
+    plan.plan_name = plan_update.plan_name
+    plan.description = plan_update.description
+    plan.start_date = plan_update.start_date
+    plan.end_date = plan_update.end_date
+    plan.day_type = plan_update.day_type
+    plan.is_template = plan_update.is_template
     plan.updated_at = datetime.utcnow()
+    
+    # Update title for backward compatibility
+    if hasattr(plan, 'title'):
+        plan.title = plan_update.plan_name
+    
+    # Delete existing exercises
+    db.query(PlanExercise).filter(PlanExercise.plan_id == plan_id).delete()
+    
+    # Add new exercises
+    for exercise_data in plan_update.exercises:
+        exercise = PlanExercise(
+            plan_id=plan.id,
+            **exercise_data.dict()
+        )
+        db.add(exercise)
+    
     db.commit()
     db.refresh(plan)
     

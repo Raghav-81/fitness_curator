@@ -4,6 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fitness Curator - Workout Management System</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="512x512" href="/static/logo-512.png">
+    <link rel="icon" type="image/png" sizes="256x256" href="/static/favicon-256.png">
+    <link rel="icon" type="image/png" sizes="128x128" href="/static/favicon-128.png">
+    <link rel="icon" type="image/png" sizes="64x64" href="/static/favicon-64.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/static/favicon-32.png">
+    <link rel="apple-touch-icon" href="/static/logo-512.png">
+    <link rel="shortcut icon" href="/static/favicon.ico">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -61,23 +70,34 @@
         .nav-container {
             max-width: 1400px;
             margin: 0 auto;
-            display: flex;
-            align-items: center;
             padding: 0 20px;
         }
         
         .nav-brand {
-            font-size: 1.5rem;
-            font-weight: 700;
-            background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            padding: 20px 0;
+            padding: 15px 0;
             margin-right: 40px;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 15px;
+            font-size: 1.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #ff6b35 0%, #f97316 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.02em;
+        }
+        
+        .nav-brand img {
+            width: 55px;
+            height: 55px;
+            object-fit: contain;
+            filter: drop-shadow(0 2px 8px rgba(255, 107, 53, 0.3));
+            transition: transform 0.3s ease;
+        }
+        
+        .nav-brand:hover img {
+            transform: scale(1.1) rotate(5deg);
         }
         
         .nav-brand i {
@@ -270,11 +290,10 @@
             font-weight: 900;
             line-height: 1;
             margin-bottom: 10px;
-            color: #ffffff;
-            text-shadow: 3px 3px 12px rgba(0, 0, 0, 0.5), 0 0 20px rgba(255, 255, 255, 0.3);
+            color: #fffef9;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
             position: relative;
             z-index: 1;
-            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
         }
         
         .stat-item .stat-label {
@@ -283,10 +302,9 @@
             text-transform: uppercase;
             letter-spacing: 0.08em;
             color: #ffffff;
-            opacity: 1;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
             position: relative;
             z-index: 1;
-            text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.4);
         }
         
         .search-btn {
@@ -353,11 +371,13 @@
         .stat-value {
             font-size: 2rem;
             font-weight: 700;
-            color: #667eea;
+            color: #ffffff !important;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.25) !important;
         }
         
         .stat-label {
-            color: #666;
+            color: #ffffff !important;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2) !important;
             font-size: 0.9rem;
             margin-top: 5px;
         }
@@ -562,7 +582,7 @@
     <nav class="nav-tabs">
         <div class="nav-container">
             <div class="nav-brand">
-                <i class="fas fa-dumbbell"></i>
+                <img src="/static/logo.png" alt="Fitness Curator Logo">
                 Fitness Curator
             </div>
             <div class="nav-links">
@@ -678,9 +698,15 @@
                         <label for="existing-plan-select">
                             <i class="fas fa-history"></i> Load Existing Plan (Optional)
                         </label>
-                        <select id="existing-plan-select" onchange="loadPlanToEdit(this.value)">
-                            <option value="">Create New Plan</option>
-                        </select>
+                        <div style="display: flex; gap: 10px; align-items: start;">
+                            <select id="existing-plan-select" onchange="loadPlanToEdit(this.value)" style="flex: 1;">
+                                <option value="">Create New Plan</option>
+                            </select>
+                            <button id="delete-plan-btn" class="btn-modern" onclick="deleteCurrentPlan()" 
+                                    style="padding: 12px 20px; background: #dc2626; color: white; display: none;">
+                                <i class="fas fa-trash"></i> Delete
+                            </button>
+                        </div>
                         <p style="font-size: 0.85rem; color: #666; margin-top: 5px;">
                             <i class="fas fa-lightbulb"></i> Select a plan to edit or leave blank to create new
                         </p>
@@ -1601,8 +1627,8 @@
                     modalContent += `
                         <div style="display: flex; flex-direction: column; gap: 15px; max-height: 60vh; overflow-y: auto;">
                             ${plans.map(plan => `
-                                <div class="premium-card" style="padding: 20px;">
-                                    <div style="display: flex; justify-content: between; align-items: start; margin-bottom: 15px;">
+                                <div class="premium-card" style="padding: 20px;" id="plan-card-${plan.id}">
+                                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 15px;">
                                         <div style="flex: 1;">
                                             <h4 style="margin: 0 0 8px 0; color: #ff6b35;">${plan.plan_name}</h4>
                                             ${plan.description ? `<p style="margin: 0 0 10px 0; color: #666; font-size: 0.9rem;">${plan.description}</p>` : ''}
@@ -1612,11 +1638,17 @@
                                                 <span><i class="fas fa-dumbbell"></i> ${plan.exercises?.length || 0} exercises</span>
                                             </div>
                                         </div>
-                                        ${plan.share_token ? `
-                                            <button class="btn-modern btn-outline" onclick="copyPlanLink('${plan.share_token}')" style="padding: 8px 16px;">
-                                                <i class="fas fa-link"></i> Copy Link
+                                        <div style="display: flex; gap: 8px;">
+                                            ${plan.share_token ? `
+                                                <button class="btn-modern btn-outline" onclick="copyPlanLink('${plan.share_token}')" style="padding: 8px 16px;">
+                                                    <i class="fas fa-link"></i> Copy Link
+                                                </button>
+                                            ` : ''}
+                                            <button class="btn-modern" onclick="deletePlan(${plan.id}, '${plan.plan_name.replace(/'/g, "\\'")}', ${clientId})" 
+                                                    style="padding: 8px 16px; background: #dc2626; color: white;">
+                                                <i class="fas fa-trash"></i> Delete
                                             </button>
-                                        ` : ''}
+                                        </div>
                                     </div>
                                 </div>
                             `).join('')}
@@ -1647,6 +1679,42 @@
             }).catch(() => {
                 window.toast.error('Failed to copy link');
             });
+        };
+        
+        // Delete workout plan
+        window.deletePlan = async function(planId, planName, clientId) {
+            // Confirm deletion
+            const confirmed = confirm(`⚠️ Are you sure you want to delete "${planName}"?\n\nThis action cannot be undone. The client will lose access to this workout plan.`);
+            
+            if (!confirmed) return;
+            
+            try {
+                const response = await fetch(`/api/workout-plans/${planId}`, {
+                    method: 'DELETE'
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Failed to delete plan');
+                }
+                
+                // Remove the plan card from UI
+                const planCard = document.getElementById(`plan-card-${planId}`);
+                if (planCard) {
+                    planCard.style.opacity = '0';
+                    planCard.style.transform = 'scale(0.9)';
+                    planCard.style.transition = 'all 0.3s ease';
+                    setTimeout(() => planCard.remove(), 300);
+                }
+                
+                window.toast.success(`✅ "${planName}" deleted successfully`);
+                
+                // Refresh the modal after a short delay to show updated list
+                setTimeout(() => viewClientPlans(clientId), 500);
+                
+            } catch (error) {
+                console.error('Error deleting plan:', error);
+                window.toast.error('❌ Failed to delete plan: ' + error.message);
+            }
         };
         
         // Edit client - Switch to Workout Creator with client selected

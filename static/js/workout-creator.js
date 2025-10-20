@@ -2,17 +2,16 @@
  * Workout Creator JavaScript
  * Handles workout plan creation with drag-and-drop, video library integration
  */
-
 // State management
 const workoutCreatorState = {
     clients: [],
     videos: [],
     filteredVideos: [],
     exercises: [],
-    selectedClient: null,
     exerciseCounter: 0,
-    dayFormat: 'day_number'  // 'day_number' or 'day_of_week'
-};
+    dayFormat: 'day_number',
+    currentPlanId: null  // Track if editing existing plan
+};  // 'day_number' or 'day_of_week'
 
 // Initialize workout creator
 document.addEventListener('DOMContentLoaded', () => {
@@ -121,15 +120,25 @@ window.loadClientPlans = async function(clientId) {
 
 // Load plan data into form for editing
 window.loadPlanToEdit = async function(planId) {
+    const deleteBtn = document.getElementById('delete-plan-btn');
+    
     if (!planId) {
         // Reset form if "Create New Plan" is selected
         resetWorkoutCreatorForm();
+        workoutCreatorState.currentPlanId = null;
+        if (deleteBtn) deleteBtn.style.display = 'none';
         return;
     }
     
     try {
         const response = await fetch(`/api/workout-plans/${planId}`);
         const plan = await response.json();
+        
+        // Store the plan ID for updating
+        workoutCreatorState.currentPlanId = plan.id;
+        
+        // Show delete button
+        if (deleteBtn) deleteBtn.style.display = 'block';
         
         // Populate form fields
         document.getElementById('plan-name').value = plan.plan_name || '';
@@ -174,7 +183,7 @@ window.loadPlanToEdit = async function(planId) {
             });
         }
         
-        window.toast.success(`Loaded plan: ${plan.plan_name}`);
+        window.toast.success(`📝 Loaded plan: ${plan.plan_name}`);
         
     } catch (error) {
         console.error('Error loading plan:', error);
@@ -808,9 +817,16 @@ async function saveWorkoutPlan() {
             exercises: exercises
         };
         
+        // Determine if updating or creating
+        const isUpdating = workoutCreatorState.currentPlanId !== null;
+        const url = isUpdating 
+            ? `/api/workout-plans/${workoutCreatorState.currentPlanId}`
+            : '/api/workout-plans';
+        const method = isUpdating ? 'PUT' : 'POST';
+        
         // Send to API
-        const response = await fetch('/api/workout-plans', {
-            method: 'POST',
+        const response = await fetch(url, {
+            method: method,
             headers: {
                 'Content-Type': 'application/json'
             },
@@ -825,13 +841,18 @@ async function saveWorkoutPlan() {
         const savedPlan = await response.json();
         
         // Show success message
-        window.toast.success('✅ Workout plan saved successfully!');
+        if (isUpdating) {
+            window.toast.success('✅ Workout plan updated successfully!');
+        } else {
+            window.toast.success('✅ Workout plan created successfully!');
+        }
         
         // Show share link modal
         if (savedPlan.share_token) {
             const shareUrl = `${window.location.origin}/workout-plan/${savedPlan.share_token}`;
+            const modalTitle = isUpdating ? '✅ Workout Plan Updated!' : '🎉 Workout Plan Created!';
             const modalContent = `
-                <h3 style="margin-bottom: 20px;">🎉 Workout Plan Created!</h3>
+                <h3 style="margin-bottom: 20px;">${modalTitle}</h3>
                 <p style="margin-bottom: 15px;">Share this link with your client:</p>
                 <div style="background: #f3f4f6; padding: 15px; border-radius: 8px; margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
                     <input type="text" value="${shareUrl}" readonly style="flex: 1; border: none; background: transparent; font-family: monospace; font-size: 0.9rem;" id="share-url-input">
@@ -928,6 +949,7 @@ window.resetWorkoutCreatorForm = function() {
     workoutCreatorState.exercises = [];
     workoutCreatorState.exerciseCounter = 0;
     workoutCreatorState.dayFormat = 'day_number';
+    workoutCreatorState.currentPlanId = null;  // Clear editing state
     
     // Update exercise counts
     updateExerciseCount('warmup');
@@ -974,6 +996,46 @@ function initializeSortable() {
         });
     }
 }
+
+// Delete current plan from workout creator
+window.deleteCurrentPlan = async function() {
+    if (!workoutCreatorState.currentPlanId) {
+        window.toast.error('⚠️ No plan selected to delete');
+        return;
+    }
+    
+    const planName = document.getElementById('plan-name')?.value || 'this plan';
+    const clientId = document.getElementById('plan-client-select')?.value;
+    
+    // Confirm deletion
+    const confirmed = confirm(`⚠️ Are you sure you want to delete "${planName}"?\n\nThis action cannot be undone. The client will lose access to this workout plan.`);
+    
+    if (!confirmed) return;
+    
+    try {
+        const response = await fetch(`/api/workout-plans/${workoutCreatorState.currentPlanId}`, {
+            method: 'DELETE'
+        });
+        
+        if (!response.ok) {
+            throw new Error('Failed to delete plan');
+        }
+        
+        window.toast.success(`✅ "${planName}" deleted successfully`);
+        
+        // Reset the form
+        resetWorkoutCreatorForm();
+        
+        // Reload the plans dropdown if client is still selected
+        if (clientId) {
+            await loadClientPlans(clientId);
+        }
+        
+    } catch (error) {
+        console.error('Error deleting plan:', error);
+        window.toast.error('❌ Failed to delete plan: ' + error.message);
+    }
+};
 
 // Open client modal (to be implemented)
 function openClientModal() {
