@@ -51,6 +51,9 @@ class WorkoutPlanCreate(BaseModel):
     end_date: Optional[datetime] = None
     is_template: bool = False
     day_type: str = "day_number"  # "day_number" or "day_of_week"
+    number_of_days: Optional[int] = None  # Number of days in split
+    weeks_duration: Optional[int] = None  # Number of weeks
+    day_labels: Optional[dict] = None  # Custom day labels {"1": "Push Day", "2": "Pull Day"}
     exercises: List[PlanExerciseCreate] = []
 
 class WorkoutPlanUpdate(BaseModel):
@@ -144,7 +147,10 @@ async def create_workout_plan(plan: WorkoutPlanCreate, db: Session = Depends(get
         start_date=plan.start_date,
         end_date=plan.end_date,
         is_template=plan.is_template,
-        day_type=plan.day_type
+        day_type=plan.day_type,
+        number_of_days=plan.number_of_days,
+        weeks_duration=plan.weeks_duration,
+        day_labels=plan.day_labels
     )
     
     # Also set title for backward compatibility with old schema
@@ -225,6 +231,9 @@ async def update_workout_plan(
     plan.end_date = plan_update.end_date
     plan.day_type = plan_update.day_type
     plan.is_template = plan_update.is_template
+    plan.number_of_days = plan_update.number_of_days
+    plan.weeks_duration = plan_update.weeks_duration
+    plan.day_labels = plan_update.day_labels
     plan.updated_at = datetime.utcnow()
     
     # Update title for backward compatibility

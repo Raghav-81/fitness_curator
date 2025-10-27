@@ -805,6 +805,20 @@ async function saveWorkoutPlan() {
             return;
         }
         
+        // Collect day labels
+        const numberOfDays = document.getElementById('number-of-days')?.value;
+        const weeksDuration = document.getElementById('weeks-duration')?.value;
+        const dayLabels = {};
+        
+        if (numberOfDays) {
+            for (let i = 1; i <= parseInt(numberOfDays); i++) {
+                const labelInput = document.getElementById(`day-${i}-label`);
+                if (labelInput && labelInput.value.trim()) {
+                    dayLabels[i.toString()] = labelInput.value.trim();
+                }
+            }
+        }
+        
         // Create plan object
         const planData = {
             client_id: parseInt(clientId),
@@ -812,6 +826,9 @@ async function saveWorkoutPlan() {
             description: description || null,
             start_date: startDate || null,
             end_date: endDate || null,
+            number_of_days: numberOfDays ? parseInt(numberOfDays) : null,
+            weeks_duration: weeksDuration ? parseInt(weeksDuration) : null,
+            day_labels: Object.keys(dayLabels).length > 0 ? dayLabels : null,
             is_template: true,  // Always save as template
             day_type: dayType,
             exercises: exercises
@@ -1042,3 +1059,91 @@ function openClientModal() {
     showToast('Client creation modal coming soon!', 'info');
     // TODO: Implement client creation modal
 }
+
+// Update day labels configuration based on number of days
+window.updateDayLabelsConfig = function() {
+    const numberOfDays = parseInt(document.getElementById('number-of-days')?.value || 3);
+    const container = document.getElementById('day-labels-inputs');
+    
+    if (!container) return;
+    
+    // Clear existing inputs
+    container.innerHTML = '';
+    
+    // Create input for each day
+    for (let i = 1; i <= numberOfDays; i++) {
+        const inputWrapper = document.createElement('div');
+        inputWrapper.style.cssText = 'display: flex; flex-direction: column; gap: 5px;';
+        
+        inputWrapper.innerHTML = `
+            <label for="day-${i}-label" style="font-size: 0.85rem; font-weight: 600; color: #666;">
+                Day ${i}
+            </label>
+            <input 
+                type="text" 
+                id="day-${i}-label" 
+                class="day-label-input"
+                placeholder="e.g., Push Day, Pull Day"
+                style="padding: 10px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 0.95rem;"
+            >
+        `;
+        
+        container.appendChild(inputWrapper);
+    }
+    
+    // Update day dropdowns in exercise rows
+    updateExerciseDayDropdowns();
+};
+
+// Update day dropdowns in all exercise rows
+function updateExerciseDayDropdowns() {
+    const numberOfDays = parseInt(document.getElementById('number-of-days')?.value || 3);
+    const dayFormat = document.getElementById('plan-day-type')?.value || 'day_number';
+    
+    // Get all day selects in exercise rows
+    const daySelects = document.querySelectorAll('.exercise-day-select');
+    
+    daySelects.forEach(select => {
+        const currentValue = select.value;
+        select.innerHTML = '';
+        
+        // Populate based on format
+        if (dayFormat === 'day_number') {
+            for (let i = 1; i <= numberOfDays; i++) {
+                const option = document.createElement('option');
+                option.value = i.toString();
+                
+                // Check if there's a custom label
+                const labelInput = document.getElementById(`day-${i}-label`);
+                const label = labelInput?.value?.trim();
+                
+                option.textContent = label ? `Day ${i} - ${label}` : `Day ${i}`;
+                select.appendChild(option);
+            }
+        } else {
+            // Days of week
+            const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+            daysOfWeek.forEach(day => {
+                const option = document.createElement('option');
+                option.value = day;
+                option.textContent = day;
+                select.appendChild(option);
+            });
+        }
+        
+        // Restore previous value if it exists
+        if (currentValue && Array.from(select.options).some(opt => opt.value === currentValue)) {
+            select.value = currentValue;
+        } else {
+            select.selectedIndex = 0;
+        }
+    });
+}
+
+// Initialize day labels on page load
+document.addEventListener('DOMContentLoaded', () => {
+    // Initialize with default 3 days
+    if (document.getElementById('day-labels-inputs')) {
+        updateDayLabelsConfig();
+    }
+});

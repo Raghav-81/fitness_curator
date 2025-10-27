@@ -741,6 +741,49 @@
                         </div>
                     </div>
                     
+                    <!-- Multi-Day Split Configuration -->
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="number-of-days">
+                                <i class="fas fa-calendar-week"></i> Days in Split
+                            </label>
+                            <select id="number-of-days" onchange="updateDayLabelsConfig()">
+                                <option value="1">1 Day</option>
+                                <option value="2">2 Days</option>
+                                <option value="3" selected>3 Days</option>
+                                <option value="4">4 Days</option>
+                                <option value="5">5 Days</option>
+                                <option value="6">6 Days</option>
+                                <option value="7">7 Days</option>
+                            </select>
+                            <p style="font-size: 0.85rem; color: #666; margin-top: 5px;">
+                                <i class="fas fa-info-circle"></i> Number of different workout days (e.g., 3 for Push/Pull/Legs)
+                            </p>
+                        </div>
+                        <div class="form-group">
+                            <label for="weeks-duration">
+                                <i class="fas fa-hourglass-half"></i> Weeks Duration
+                            </label>
+                            <input type="number" id="weeks-duration" min="1" max="52" value="12" placeholder="e.g., 12">
+                            <p style="font-size: 0.85rem; color: #666; margin-top: 5px;">
+                                <i class="fas fa-info-circle"></i> How many weeks to follow this plan
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <!-- Day Labels Configuration -->
+                    <div class="form-group" id="day-labels-container">
+                        <label>
+                            <i class="fas fa-tags"></i> Custom Day Labels
+                        </label>
+                        <div id="day-labels-inputs" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin-top: 10px;">
+                            <!-- Dynamically generated based on number-of-days -->
+                        </div>
+                        <p style="font-size: 0.85rem; color: #666; margin-top: 5px;">
+                            <i class="fas fa-lightbulb"></i> Give each day a memorable label (e.g., "Push Day", "Pull Day", "Leg Day")
+                        </p>
+                    </div>
+                    
                     <div class="form-group">
                         <label>Day Format</label>
                         <div class="toggle-button-group" style="display: flex; gap: 0; border: 2px solid var(--border-light); border-radius: 8px; overflow: hidden; margin-top: 8px;">

@@ -56,6 +56,12 @@ class WorkoutPlan(Base):
     is_template = Column(Boolean, default=False)  # Can be saved as reusable template
     share_token = Column(String(64), unique=True, index=True, nullable=True)  # For shareable links
     day_type = Column(String(20), default="day_number")  # "day_number" or "day_of_week"
+    
+    # Enhanced split configuration
+    number_of_days = Column(Integer, nullable=True)  # Number of days in split (e.g., 3 for 3-day split)
+    weeks_duration = Column(Integer, nullable=True)  # Number of weeks to follow the plan
+    day_labels = Column(JSON, nullable=True)  # Custom day labels: {"1": "Push Day", "2": "Pull Day", "3": "Leg Day"}
+    
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
@@ -80,6 +86,9 @@ class WorkoutPlan(Base):
             "is_template": self.is_template,
             "share_token": self.share_token,
             "day_type": self.day_type,
+            "number_of_days": self.number_of_days,
+            "weeks_duration": self.weeks_duration,
+            "day_labels": self.day_labels,
             "created_at": self.created_at.isoformat() if self.created_at else None,
             "updated_at": self.updated_at.isoformat() if self.updated_at else None
         }

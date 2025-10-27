@@ -324,9 +324,24 @@
             flex-shrink: 0;
         }
         
-        .exercise-video-thumb:hover {
-            transform: scale(1.1);
-            box-shadow: 0 5px 15px rgba(255, 107, 53, 0.4);
+        .prescribed-badge {
+            background: #ff6b35 !important;
+            color: white !important;
+        }
+        
+        .set-card {
+            transition: all 0.2s ease;
+        }
+        
+        .set-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .log-input:focus {
+            outline: none;
+            border-color: #ff6b35;
+            box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.1);
         }
     </style>
 </head>
@@ -394,8 +409,12 @@
             return a.localeCompare(b);
         });
         
-        // Format day labels
+        // Format day labels - use trainer's custom labels if available
         const days = uniqueDays.map(day => {
+            // Check if trainer provided custom labels
+            if (planData.day_labels && planData.day_labels[day]) {
+                return planData.day_labels[day];
+            }
             // If it's just a number, format as "Day X"
             if (!isNaN(parseInt(day)) && day == parseInt(day)) {
                 return `Day ${day}`;
@@ -597,65 +616,66 @@
                                 ${exercise.is_custom ? '<span style="background: #3b82f6; color: white; padding: 3px 10px; border-radius: 6px; font-size: 0.8rem; margin-right: 8px; font-weight: 600;">CUSTOM</span>' : ''}
                                 ${exerciseName}
                             </div>
-                            <div class="exercise-meta">
-                                ${exercise.sets ? `<span class="meta-badge"><i class="fas fa-redo"></i> Target: ${exercise.sets} sets</span>` : ''}
-                                ${exercise.reps ? `<span class="meta-badge"><i class="fas fa-hashtag"></i> ${exercise.reps} reps</span>` : ''}
-                                ${exercise.time ? `<span class="meta-badge"><i class="fas fa-clock"></i> ${exercise.time} ${exercise.time_unit || 'sec'}</span>` : ''}
-                                ${exercise.custom_equipment ? `<span class="meta-badge"><i class="fas fa-dumbbell"></i> ${exercise.custom_equipment}</span>` : ''}
-                            </div>
-                            ${exercise.notes ? `<p style="color: #666; margin-top: 8px; font-size: 0.9rem;"><i class="fas fa-sticky-note"></i> <em>${exercise.notes}</em></p>` : ''}
-                        </div>
-                    </div>
-                    
-                    <div class="log-section">
-                        <h4 style="margin-bottom: 15px; color: #ff6b35; font-size: 1rem;">
-                            <i class="fas fa-clipboard-list"></i> Log Your Sets
-                        </h4>
-                        <div style="display: flex; flex-direction: column; gap: 10px;">
-                            ${logged.sets.map((set, setIdx) => `
-                                <div style="display: grid; grid-template-columns: 60px 1fr 1fr 1fr 80px; gap: 10px; align-items: center; background: white; padding: 12px; border-radius: 8px; border: 2px solid #fed7aa;">
-                                    <div style="font-weight: 700; color: #ff6b35; text-align: center;">Set ${setIdx + 1}</div>
-                                    <div>
-                                        <label style="font-size: 0.75rem; color: #666; display: block; margin-bottom: 4px;">Reps</label>
-                                        <input type="number" class="log-input" style="width: 100%; padding: 8px;" 
-                                               value="${set.reps || ''}" 
-                                               onchange="logSetData('${exId}', ${setIdx}, 'reps', this.value)" 
-                                               placeholder="${exercise.reps || '10'}">
-                                    </div>
-                                    <div>
-                                        <label style="font-size: 0.75rem; color: #666; display: block; margin-bottom: 4px;">Weight</label>
-                                        <input type="number" class="log-input" style="width: 100%; padding: 8px;" 
-                                               value="${set.weight || ''}" 
-                                               onchange="logSetData('${exId}', ${setIdx}, 'weight', this.value)" 
-                                               placeholder="0" step="0.5">
-                                    </div>
-                                    ${exercise.time ? `
-                                    <div>
-                                        <label style="font-size: 0.75rem; color: #666; display: block; margin-bottom: 4px;">Time (${exercise.time_unit || 'sec'})</label>
-                                        <input type="number" class="log-input" style="width: 100%; padding: 8px;" 
-                                               value="${set.time || ''}" 
-                                               onchange="logSetData('${exId}', ${setIdx}, 'time', this.value)" 
-                                               placeholder="${exercise.time || '30'}">
-                                    </div>
-                                    ` : '<div></div>'}
-                                    <div>
-                                        <label style="font-size: 0.75rem; color: #666; display: block; margin-bottom: 4px;">Unit</label>
-                                        <select class="log-input" style="width: 100%; padding: 8px;" 
-                                                onchange="logSetData('${exId}', ${setIdx}, 'unit', this.value)">
-                                            <option value="kg" ${set.unit === 'kg' ? 'selected' : ''}>kg</option>
-                                            <option value="lb" ${set.unit === 'lb' ? 'selected' : ''}>lb</option>
-                                        </select>
-                                    </div>
+
+                            <!-- Prescribed Information -->
+                            <div style="background: #f8f9fa; padding: 12px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid #ff6b35;">
+                                <div style="font-size: 0.85rem; color: #666; margin-bottom: 8px; font-weight: 600;">
+                                    <i class="fas fa-clipboard-check"></i> PRESCRIBED
                                 </div>
-                            `).join('')}
-                        </div>
-                        <div style="margin-top: 15px;">
-                            <label style="font-size: 0.85rem; color: #666; display: block; margin-bottom: 8px;">
-                                <i class="fas fa-comment"></i> Workout Notes
-                            </label>
-                            <textarea class="log-input" style="width: 100%; padding: 10px; min-height: 60px; resize: vertical;" 
-                                      onchange="logGeneralData('${exId}', 'notes', this.value)" 
-                                      placeholder="How did this exercise feel? Any observations?">${logged.notes || ''}</textarea>
+                                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                                    ${exercise.sets ? `<span style="background: #ff6b35; color: white; padding: 4px 8px; border-radius: 4px; font-size: 0.8rem;"><i class="fas fa-redo"></i> ${exercise.sets} sets</span>` : ''}
+                                    ${exercise.reps ? `<span style="background: #ff6b35; color: white; padding: 4px 8px; border-radius: 4px; font-size: 0.8rem;"><i class="fas fa-hashtag"></i> ${exercise.reps} reps</span>` : ''}
+                                    ${exercise.time ? `<span style="background: #ff6b35; color: white; padding: 4px 8px; border-radius: 4px; font-size: 0.8rem;"><i class="fas fa-clock"></i> ${exercise.time} ${exercise.time_unit || 'sec'}</span>` : ''}
+                                </div>
+                            </div>
+
+                            <!-- Logging Section -->
+                            <div style="background: #fff5e6; padding: 12px; border-radius: 8px; border-left: 4px solid #10b981;">
+                                <div style="font-size: 0.85rem; color: #666; margin-bottom: 12px; font-weight: 600;">
+                                    <i class="fas fa-edit"></i> LOG YOUR SETS
+                                </div>
+
+                                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 8px; margin-bottom: 12px;">
+                                    ${logged.sets.map((set, setIdx) => `
+                                        <div style="background: white; padding: 8px; border-radius: 6px; border: 1px solid #fed7aa; text-align: center;">
+                                            <div style="font-weight: 700; color: #ff6b35; margin-bottom: 6px; font-size: 0.8rem;">Set ${setIdx + 1}</div>
+                                            <div style="display: flex; gap: 4px; margin-bottom: 4px;">
+                                                <div style="flex: 1;">
+                                                    <input type="number" class="log-input" style="width: 100%; padding: 4px; font-size: 0.8rem; border: 1px solid #ddd; border-radius: 3px;"
+                                                           value="${set.reps || ''}"
+                                                           onchange="saveSetData('${exId}', ${setIdx}, 'reps', this.value)"
+                                                           placeholder="Reps">
+                                                </div>
+                                                <div style="flex: 1;">
+                                                    <input type="number" class="log-input" style="width: 100%; padding: 4px; font-size: 0.8rem; border: 1px solid #ddd; border-radius: 3px;"
+                                                           value="${set.weight || ''}"
+                                                           onchange="saveSetData('${exId}', ${setIdx}, 'weight', this.value)"
+                                                           placeholder="Kg" step="0.5">
+                                                </div>
+                                            </div>
+                                            ${exercise.time ? `
+                                            <div>
+                                                <input type="number" class="log-input" style="width: 100%; padding: 4px; font-size: 0.8rem; border: 1px solid #ddd; border-radius: 3px;"
+                                                       value="${set.time || ''}"
+                                                       onchange="saveSetData('${exId}', ${setIdx}, 'time', this.value)"
+                                                       placeholder="Time">
+                                            </div>
+                                            ` : ''}
+                                        </div>
+                                    `).join('')}
+                                </div>
+
+                                <div>
+                                    <label style="font-size: 0.8rem; color: #666; display: block; margin-bottom: 6px;">
+                                        <i class="fas fa-comment"></i> Notes
+                                    </label>
+                                    <textarea class="log-input" style="width: 100%; padding: 8px; min-height: 50px; resize: vertical; font-size: 0.85rem; border: 1px solid #ddd; border-radius: 4px;"
+                                              onchange="logGeneralData('${exId}', 'notes', this.value)"
+                                              placeholder="How did this exercise feel?">${logged.notes || ''}</textarea>
+                                </div>
+                            </div>
+
+                            ${exercise.notes ? `<div style="margin-top: 12px; padding: 10px; background: #fff3cd; border-radius: 6px; border-left: 4px solid #ffc107; font-size: 0.9rem;"><i class="fas fa-sticky-note"></i> <strong>Trainer Note:</strong> <em>${exercise.notes}</em></div>` : ''}
                         </div>
                     </div>
                     
@@ -807,11 +827,35 @@
             }
         }
         
+        // Update statistics display
+        function updateStats() {
+            try {
+                const total = planData.exercises.length;
+                const completed = Object.values(completedExercises).filter(Boolean).length;
+                const percent = total > 0 ? Math.round((completed / total) * 100) : 0;
+
+                // Update the stats cards if they exist
+                const totalElement = document.getElementById('total-exercises');
+                const completedElement = document.getElementById('completed-count');
+                const progressElement = document.getElementById('progress-percent');
+                const progressFillElement = document.getElementById('progress-fill');
+
+                if (totalElement) totalElement.textContent = total;
+                if (completedElement) completedElement.textContent = completed;
+                if (progressElement) progressElement.textContent = percent + '%';
+                if (progressFillElement) progressFillElement.style.width = percent + '%';
+
+            } catch (error) {
+                console.error('Error updating stats:', error);
+            }
+        }
+        
         // Initialize with error handling
         try {
             populateDayDropdown();
             renderDayTabs();
             renderWorkout();
+            updateStats(); // Update stats on initialization
         } catch (error) {
             console.error('Error initializing workout tracker:', error);
             document.getElementById('workout-content').innerHTML = `
